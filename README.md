@@ -2,6 +2,9 @@ Holon programming was a conceptual paradigm developed in the early 1970's by Pie
 Its purpose was to give programmers a way to write "structured programs" using mostly natural language
 descriptions (or even ideograms!) that would be replaced by blocks of executable code via a "synthesizer." 
 This idea inspired Donald Knuth to create [literate programming](https://en.wikipedia.org/wiki/Literate_programming).
+Knuth describes de Marneffe's approach as: "a way of taking a complicated program and breaking it into 
+small parts. Then, to understand the complicated whole, what you needed is just to understand the small 
+parts, and to understand the relationship between those parts and their neighbors."
 
 In 1973, de Marneffe wrote a document describing holon programming and privately circulated it among
 computer scientists. This document thereafter became a Borgesian mythical book, existing only in citations
