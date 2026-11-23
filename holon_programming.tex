@@ -1,0 +1,4199 @@
+\documentclass[openany,nobib]{tufte-book}
+
+\hypersetup{colorlinks}
+
+\newcommand{\subtitle}[1]{\gdef\thesubtitle{#1}}
+
+\renewcommand{\maketitlepage}{%
+{%
+\begin{fullwidth}%
+\fontsize{18}{20}\selectfont\par\noindent
+  \textcolor{darkgray}{\it\thanklessauthor}%
+\vspace{11.5pc}%
+\fontsize{48}{40}\selectfont\par\noindent
+  \textcolor{darkgray}{\thanklesstitle}%
+\vspace{0.5pc}%
+{\fontsize{26}{40}\selectfont\par\noindent
+  \textcolor{darkgray}{\thesubtitle}}%
+\vfill%
+\fontsize{14}{16}\selectfont\par\noindent{\it\thanklesspublisher}%
+\end{fullwidth}%
+}
+\thispagestyle{empty}%
+\clearpage%
+}
+
+\title{Holon Programming}
+\subtitle{A Survey}
+\author{Pierre-Arnoul de Marneffe}
+\publisher{December 1973}
+
+\usepackage[greek,english]{babel}
+% no Palatino Greek in LGR: substitute CM Greek explicitly
+\DeclareFontFamily{LGR}{pplj}{}
+\DeclareFontShape{LGR}{pplj}{m}{n}{<->ssub*cmr/m/n}{}
+\usepackage{csquotes}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes.geometric,matrix,angles,arrows.meta}
+\tikzstyle{every picture}+=[font=\sffamily]
+\usepackage[edges]{forest}
+
+% program keywords; indent in units of 2mm
+\newcommand{\kw}[1]{{\bf #1}}
+\newcommand{\ind}[1]{\-\hspace{\dimexpr 2mm*#1\relax}}
+\newcommand{\spchar}{'\textvisiblespace\,'}
+\newcommand{\na}{\quad--}% used in tables for N/A cells
+
+% BNF
+\newcommand{\sym}[1]{$\langle$#1$\rangle$}
+\def\is{$::=$\ }
+\def\alt{$|$\ }
+
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable}
+\tcbset{width=1.1\textwidth, halign=justify, colframe=lightgray,
+  boxrule=0.4pt, center, breakable, colback=white}
+
+\usepackage[style=verbose,citepages=omit,dashed=false,maxcitenames=1]{biblatex}
+\ExecuteBibliographyOptions{citetracker=true}
+\addbibresource{holon.bib}
+\setlength\bibitemsep{1.2\itemsep}
+
+\begin{document}
+
+% Front matter
+\frontmatter
+
+% r.1 blank page
+%\blankpage
+
+
+% r.3 full title page
+\maketitle
+
+%%% Forward
+\chapter*{Foreword}
+
+In this survey of the Holon Programming Concept,
+we shall try to collect together all the different
+notes we have written about this problem. All the
+texts about Holon Programming were written in French\autocite{marneffe1972}
+(except the text for the {\sc ics} presentation)\autocite{marneffe1973}, and
+that precludes a diffusion of the concept, and at the
+same time, a welcome feedback of criticisms and
+comments to the author.
+
+This survey was written during a stay at the IBM Federal
+Systems Center (Gaithersburg, Maryland). This stay was
+supported by the Belgian Fund for Scientific Research
+(F.N.R.S) with the help of the IBM-Belgium Donation.
+\clearpage
+
+%*******************************************************
+% Abstract
+%*******************************************************
+%\renewcommand{\abstractname}{Abstract}
+\pdfbookmark[1]{Abstract}{Abstract}
+\begingroup
+\let\clearpage\relax
+\let\cleardoublepage\relax
+\let\cleardoublepage\relax
+
+\chapter*{Abstract}
+The ``Holon Programming Language'' is designed to force
+the programmer to design programs according to a
+top-down methodology (structured programming). But, the
+language is designed to generate well-structured and
+efficient programs. The holon concept is explained; the
+Holon Language Syntax is described; and some further
+developments are presented: stretching the concept to
+concurrent processes, and the development of a holon
+operating system for a virtual memory computer.
+
+\endgroup
+
+\vfill
+
+
+% r.5 contents
+\tableofcontents
+
+\listoffigures
+
+%%
+% Start the main matter (normal chapters)
+\mainmatter
+
+\chapter{Letter to the Author from Knuth}
+\label{ch:knuth-letter}
+
+\hfill April 1, 1974
+
+\noindent Prof. Pierre-Arnoul de Marneffe\\
+\noindent Universit\'e de Li\`ege\\
+\noindent Service d'Informatique\\
+\noindent Avenue des Tilleuls 59\\
+\noindent {\sc b}-4000 Li\`ege, Belgium\\
+
+\bigskip
+
+\noindent Dear Prof. de Marneffe:
+
+\medskip
+
+Thank you very much for sending me your survey of Holon Programming. I
+especially enjoyed your references to the non-computer literature (Koestler,
+Bernard-Shaw, Shanley, Mount Vernon, etc.) since computer scientists need to
+avoid insularity.
+
+I believe you are making important strides toward the development of a new
+programming language. There still remain some unclear areas but you are
+obviously addressing the correct issues; the next thing to do (it seems to me)
+is to program  several hundred examples!
+
+For related reading I would suggest that you carefully study Ole-Johan Dahl's
+papers on SIMULA since his class concept is so close to the holon concept. Also
+I have just heard that Brian Randell of Newcastle has been working on a
+so-called PEARL system.
+
+I found your report could have been improved if you had worked entirely with
+tree structures instead of converting to binary trees. The original tree
+structure is what is really relevant, and the Dewey notation for such structure
+is more directly suited to the operations you discuss. The binary tree is only
+a machine-oriented representation of the basic concept, the discussion should
+stay at a higher level.
+
+Secondly, I found the report too preoccupied with details of implementation.
+The people by whom it is most important that this report be read are either
+able to visualize easily how to implement this sort of system, or else they are
+people who are not likely to care how it's implemented as long as it's handled
+sensibly. The important thing to stress is rather the conceptual issues of how
+holon programming differs from and improves on today's languages.
+
+The example didn't come until page 100,\marginnote{page~\pageref{ch:prog} of
+this document} while I expect most readers would have preferred to see it
+immediately. Since the program is almost self-explanatory, you can let it
+explain the language at the same time (integration of functions!).
+
+Ideally there should be more examples of course.
+
+The one example raises some interesting issues since the individual holons
+don't quite state their assumptions. In the very first holon, for example, it
+is not at all clear why you `find first word starting character' instead of
+going right into `find a word \kw{etc}.' You must already have made a decision
+(a) that you wouldn't assume the text begins with a nonblank, (b) that there is
+going to be at this level an element of data representing the last-read
+character, (c) that the `find a word' routine will already have its first
+character in hand, and (d) that there is no need to test for a message that has
+no words (only a full stop). As I recall when I was solving that problem, it
+took me a good five minutes to reach these decisions, during which I must have
+considered lots of alternatives. Once this step was made the rest of the
+program flowed naturally. My questions are: Where should we state these
+assumptions? Shouldn't we mention the existence of data representing the
+last-read character, even though we don't want to specify its detailed
+structure until later?
+
+These issues seem to arise repeatedly and I haven't a first conclusion about
+what we ought to do. That's why I suggest working out hundreds of examples, as
+being the best kind of eating to prove the pudding at this stage. On the other
+hand creating the holon implementation itself is equivalent to working out
+quite a few examples.
+
+Thanks again for showing me your stimulating work. I myself must get on with
+the writing of volume 4 of my series, so I have little energy to devote to the
+development of languages, but I will do my best to see that other people
+working in the area are kept informed of what you are doing.
+
+\medskip
+
+\hfill Sincerely,
+
+\bigskip
+
+\hfill Donald E. Knuth
+
+\hfill Professor
+
+\bigskip
+\bigskip
+
+\noindent P.S. Is there a place in Belgium whose postal code is {\sc b}-6700
+like the Burroughs computer?
+
+
+% v.2 epigraphs
+\newpage\thispagestyle{empty}
+
+
+\vspace*{\fill}
+
+\begin{flushright}{
+    Your Royal Academician thinks he can get the
+    style of Giotto without Giotto's beliefs, and
+    correct his perspectives in the bargain. Your
+    man of letters thinks he can get Bunyan's
+    conviction or Shakespear's apprehension,
+    especially if he takes care not to split his
+    infinitives. And so with your Doctor of Music,
+    who, with their collections of discords duly
+    prepared and resolved or retarded or anticipated
+    in the manner of the great composers think they
+    can learn the art of Palestrina from
+    Cherubini's treatise.} \\ \medskip
+    --- {\sc \large george bernard shaw} \\
+    {\sl Letter to Arthur Bingham Walkley}
+\end{flushright}
+
+%************************************************
+\chapter[Structured Programming and Present Programming Languages]{Structured
+Programming and\\Present Programming Languages}\label{ch:introduction}
+%************************************************
+
+It was contended by Dijkstra that: ``\dots the art of programming is the art of
+organizing complexity, of mastering multitude and avoiding its bastard chaos as
+effectively as possible\dots.''\autocite{dijkstra1971short} His letter to the
+{\sc acm}'s Editor about the ``harmful GOTO
+statement''\autocite{dijkstra1968letters} was already an attempt to avoid
+``chaos'' in programming. A full explanation of a methodology to design
+well-formed programs appeared for the first time in his ``Notes on Structured
+Programming.''\autocite{Dijkstra1970-ja} It is assumed in the next sections
+that the reader is familiar with the notions of structured programming and
+top-down programming. (If not, useful references are Dijkstra's above-mentioned
+``Notes,'' Wirth,\autocite{wirth1971program}
+Woodger,\autocite{woodger1971semantic} and
+Mills\autocite{mills1972mathematical}).
+
+Many people use the structured programming methodology on purpose to write
+large programs. The unconvinced reader of Dijkstra's ``Notes'' was surely
+struck by the publication of practical
+results.\autocite{baker1972chief}\autocite{baker1972system} However, the use of
+the structured programming methodology with the present programming languages
+has, in our opinion, several drawbacks.
+
+A) The programmer cannot use the same language for the design and the
+implementation of a program. The design phase of the program is performed by
+using a design language which allows only the writing of structured programming
+control statements ({\sl ifthenelse}, {\sl dowhile}, {\sl repeatuntil}, {\sl
+case}, {\sl sequence}). Those control statements link together a series of
+abstract levels, the definition of which is postponed. But, when all the levels
+are defined in this way, the programmer must undertake the mapping of the
+designed program into an executable one. This last one must be written in a
+``machine-understandable'' language. But this mapping is a nontrivial and
+error-prone operation.
+
+B) Another problem is the correspondence between each level of the structured
+program and an implementation unit for this level. Woodger was the first one,
+in my opinion, to point out the lack of a suitable tool for implementing
+semantic levels (Woodger's semantic level is similar to Dijkstra's
+pearl\footnote{See Section 14 of Dijkstra's {\it Notes}.}).
+%\autocite{snowdon}
+
+It is impossible to give to the programmer a ``rule of thumb'' for the relation
+between semantic level and implementation unit: suppose you teach a programmer
+to structure a program by a stepwise process, introducing a lot of levels---and
+that is the right way---you can't advise the programmer to implement each level
+as a procedure, because that will generate a very inefficient
+program.\autocite{horning1973process} On the other hand, you can't allow the
+programmer to follow the rule: create levels as you introduce procedures in
+conventional programming. Application of this rule will not produce structured
+programs! Because:
+
+1) Structuring programs by procedures leads to programs structured by ``large
+steps.'' This way may easily produce incorrect
+programs.\autocite{henderson1972experiment}
+
+2) The programmer is influenced by the language which he usually
+uses.\autocite{dijkstra1972humble} But, it must be well-understood that he is
+influenced not only by the language syntax but also by the idiosyncrasies of
+the compiler and the computer he uses. Programmers avoid language statements
+which lead to unclear compiler error messages. In his use of procedures, the
+programmer is influenced by the relative cost of the procedure overhead on his
+computer.
+
+C) When a structured program is translated into a program written in a
+conventional language (i.e., not designed for structured programs only), errors
+may cut right across the layers, because these are only abstractions (Van der
+Poel,\autocite{naur1969software} page 51).
+
+With all these drawbacks in mind, it may seem sensible to design a language
+which would force the programmer to design Well-structured programs. The
+language must help the programmer to write programs without any computer
+architecture in mind. The language structure must permit automatic translation
+of a structured program into an efficient one. We shall try to design such a
+language by the use of the ``Holon'' concept.
+
+%*****************************************
+\chapter{The ``Holon'' Concept}
+%*****************************************
+
+We shall show that the close connection of the ``Holon'' concept to the
+structured programming principles justifies its use in the language design. A
+systematic use of this concept will help to suppress that shortcomings of the
+use of the present programming languages for writing structured programs.
+
+The ``Holon'' concept has been introduced in biological and behaviour sciences
+by Koestler.\autocite{koestler1968ghost} This concept proceeds from work of
+Simon.\autocite{simon1962architecture} It is used for instance to analyse
+complex living organisms or complex social systems.
+
+This neologism is from Greek ``holos'' (\textgreek{ὅλος}), i.e., whole, and the
+suffix ``-on'' meaning ``part.'' A holon is a ``part of a whole.'' The reader
+is forewarned to not mix up the holon concept with the ``module'' one. The
+difference will clearly appear, we hope, in the next paragraphs.
+
+According to the holon concept, the complex systems can survive only if they
+are holons. A complex system must be a hierarchic ordering of functions
+(holons) with the following features:
+
+A) ``Hierarchy'': Each holon is composed by other holons which are
+``refinements'' of the former holon. These holons are submitted to some rigid
+rules; they perform the ``detail'' operations which, put together, compose the
+function of the former holon.
+
+B) ``Tendency to Autonomy'': Each holon has the ability to check its
+``environment'' before performing its function; it may modify its behaviour
+according to test results. There exists a clear distinction between a ``state
+description'' and a ``process description.''\footnote{Ibid.} The holon function
+corresponds to the process description; but it checks if the environment upon
+which it acts, belongs to its expected state description.
+
+C) ``Tendency to Integration'': The holon integrates with other holons in the
+hierarchy according to a flexible strategy. This integration must be understood
+as a will to close cooperation with the other holons for the emergence of a
+``tougher'' and more efficient component.
+
+A full description of the holon concept appears in Koestler's {\it The Ghost in
+the Machine}, chapters three to eight. Only the main features were described in
+this section. In the next section, we will display the relation between this
+concept and the design of structured programs.
+
+%************************************************
+\chapter{Holons and Structured Programming}
+%************************************************
+
+Our statement is:
+
+1) The holon model is an attractive one for a programmer using structured
+programming;
+
+2) The model may be mapped into a useful and implementable language.
+
+\medskip
+
+\noindent We shall review each of the three holon features to uncover the
+corresponding programming features.
+
+\section{Hierarchy}
+
+Anyone, familiar with the structured programming concepts, will immediately
+understand the connection between the hierarchic embedding of holons and the
+structured programming levels.
+
+\section{Tendency to autonomy}
+
+First of all, this feature must be related to the drawback pointed out by Van
+der Poel (see section 1.(c)): errors may cut right across the
+layers.\autocite{naur1969software} The ``tendency to autonomy'' may be
+understood as checking properties at an appropriate level. These properties
+must hold for any correct execution of the program.
+
+Structured Programming may be described in terms of set
+theory;\autocite{mills1972mathematical} the correctness of the program is based
+upon assertions about functions, the values of which are computed at each
+level. For instance, if the programmer is using Hoare's
+theorems,\autocite{dijkstra1971short} the correctness is guaranteed if the data
+always fit the hypothesis (assertions before each function).
+
+Where? When? How do we do this check? Answers to these three questions will be
+given in the following section.
+
+\section{Tendency to integration}
+
+This third holon feature is the most important one. With the help of an
+adequate implementation, the programmer will not have to consider anymore the
+choice of an implementation unit (open or closed procedure) for each level.
+This choice will be automatic and tailored for the computer which will execute
+the program. The choice is left to an automatic system because the relative
+cost of an open or closed procedure is a machine-dependent parameter. The cost
+is expressed as a tradeoff between time and space.
+
+In this way, the programmer designs his program in terms of a set of embedded
+functions, and the mapping of the program description in a ``machine'' program
+is outside his control. The only thing he knows is that the generated
+machine-program will be as efficient as possible for the used computer.
+
+%************************************************
+\chapter{Datatest and Invariant}
+%************************************************
+
+Now, we return to the three questions about the level properties checking:
+Where? When? How?
+
+I must confess that it takes a long time to fully understand the implications
+of the questions and the corresponding answers. The holon concept assumes that
+a complex system must check its environment to stay alive. It can be made by
+the check of the similarity between the real environment and a ``standard''
+one.
+
+\section{Where?}
+
+First, consider a holon A. The function of this holon A is made up by the
+execution of other holons, for instance: B, C, D. These three holons (B, C, D)
+are the first level of the hierarchic structure of the holon A. They may be
+composed of other holons, according to the hierarchic embedding of holons.
+
+We say that the execution of holon A is ``sensible'' only if his ``input
+environment'' is a ``legal'' one. There exists a set of predicates, the values
+of which are {\sl true} if the environment is a ``legal'' one. We call this set
+of predicates: the datatest.
+
+Now, consider the three holons (B, C, D), which are the first level of the
+hierarchic decomposition of A. Suppose that the execution of A implies the
+executions of B, C and D, in this order. After each execution of one of these
+holons, the environment of A is modified. Nevertheless, there exists a set of
+predicates (upon this environment), the values of which must be {\sl true}
+after each execution. If not, the modified environment will not belong to the
+range of holon A, after completion of the execution of A. We call this set of
+predicates: the invariant.
+
+\section{When?}
+
+When do we check the predicates of the datatest and invariant?
+
+The definitions of these two sets give well-defined positions in the holon: the
+datatest at the beginning, and the invariant after each inner holon.
+
+But each set (invariant or datatest) can be segregated in three subsets:
+
+1) A subset of predicates which can be checked at compile-time (for
+instance---data types). The extent of this subset depends on the designed
+syntax of the language.
+
+2) There are predicates, the truth of which may be proved by the programmer.
+The proof can be a formal or informal one relying upon an analysis of the
+structure of the program. This means that the programmer can prove the truth of
+these predicates, whatever the input to the program.
+
+3) There remains a set of predicates, the values of which will be computed at
+run-time.
+
+The main question is: why does the third set of predicates exist? It exists
+because the programmer wants to increase the confidence in the program
+correctness, the value of the output, and the program robustness.
+
+\section{How?}
+
+The datatest and the invariant will be made up by predicates belonging to the
+third set. They are used to trap illegal inputs which will cause havoc. We fear
+these inputs because we are unable to trace the consequences of such inputs on
+our program, or because we can't decide if this kind of input will or will not
+appear during the program lifetime.
+
+For instance, the description of many solutions of some problems are preceded
+by the foreword: ``this solution works perfectly provided\dots''; there is room
+for a datatest or an invariant.
+
+It may be argued that we don't need a special syntax in the language to
+implement this kind of ``fire-wall.'' That is true; but, in our opinion,
+casting the program hypothesis in a dedicated syntax unit will catch the
+attention of the program reader (and user) to the exact kind of hypothesis
+which was made during the program design.
+
+Many readers of previous reports about ``Holon
+Programming''\autocite{marneffe1972} have suggested that there is no need for a
+distinction between datatest and invariant. I introduced the invariant because
+a holon can have a way to verify its output. On the other hand, we can use the
+invariant to build a ``fire-wall'' when we merge several predefined holons to
+construct a new one. From time to time, we make some kind of bottom-up
+construction, even in a top-down design.
+
+The datatest may help by introducing levels in the tests we made. For instance,
+everyone knows the problem of checking the subscripts in array computation:
+Algol-Compilers made (generally) a run-time checking of the computed subscript
+expressions. This slows down the computation, but on the other hand helps for
+avoiding errors. Nevertheless, that may discourage a programmer to prove the
+programs he is writing. For instance, if you write a procedure to invert a
+matrix, and you prove (formally or informally) that this procedure outputs the
+correct inverse matrix, you may consider that the subscripts' run-time checks
+are a waste of time. The only check you need is the checking of the squareness
+of the input matrix. In a holon program, we will have a check of the matrix
+shape at the ``invert matrix'' level, without checks of subscripts in the inner
+levels. [This last point implies that there must exist functions to test the
+components of a data structure as ``finding the bounds of the range of an array
+subscript,'' etc\dots]
+
+\bigskip
+
+\noindent{\sl Remark}: The main point with the holon's tendency to autonomy is
+that the operations check (at some level) the correctness of the type of the
+data upon which they are operating. The following example appears in Koestler's
+book: when a bird is building a nest, it follows a ``program'' made up of a set
+of well-defined operations; it is not only by applying the operations in the
+right sequence but also by applying the right operation sequence to the right
+materials that the nest is built. For instance, the search and use of hard
+material (twigs) must precede the catch and use of soft material (wool, moss).
+For people with a structured programming mind, this description of a nest
+building will look like a structured program!
+
+%************************************************
+\chapter{The Holon Language Syntax}
+%************************************************
+
+To define the language syntax we will use the BNF
+notation.\marginnote{Transcriber's note: the author used an idiosyncratic
+variation of Extended Backus-Naur form. The grammar that appears here is
+written using the convention that the superscript $^+$ denotes the appearance
+of one or more syntactic elements and `[\,\dots]' delimits optional elements.}
+
+% ; nevertheless, we use the following symbols with the following meanings:
+
+% 1) [ ]: these symbols delimit a syntactic element, the appearance of which is
+% optional;
+
+% 2) \{ \}: these symbols delimit a set of syntactic elements, one of which
+% must be picked up;
+
+% 3) The three dots \dots means that the previous symbol appears one or more
+% times in the syntactic expression.
+
+\section{Three kinds of syntax}
+
+We will describe three kinds of syntax:
+
+1) The external syntax of the language,
+
+2) The internal syntax,
+
+3) The modified external syntax.
+
+\smallskip
+
+\noindent The reader may puzzle about the third syntax; as a matter of fact
+this syntax will look like the first one but with some abbreviations to ease
+the handwriting (and in this last word, the prefix ``hand'' is important). The
+modified syntax is a mapping of the external one in function of the kind of
+tools we use to write the program.
+
+\section{The external syntax}
+
+\subsection{Programs, holons and names}
+
+\begin{tcolorbox}
+\sym{program} \is \sym{holon}\\
+\sym{holon} \is \sym{holon name}\sym{holon body}\\
+\sym{holon name} \is \sym{plain holon name}\\
+    \qquad \alt \sym{holon name with parameters}\\
+\sym{plain holon name} \is \sym{element of the unreserved symbols set}$^+$\\
+\sym{holon name with parameters} \is\\
+\qquad\sym{element of the unreserved symbols set}$^+$\\
+\qquad\alt$($\sym{left identifier bracket}\sym{identifier}\sym{right identifier
+bracket}$)^+$\\
+\sym{element of the unreserved symbols set} \is\\
+\qquad``any symbol except a reserved symbol''
+\end{tcolorbox}
+
+This last definition is not a BNF one, we used this informal sentence to
+shorten the definition; as a matter of fact, the symbols set is not defined in
+holon programming; you may use anything (ideograms if you will), but there are
+some symbols which are reserved.
+
+In the symbols set you use, you must reserve the following symbols:
+\begin{enumerate}
+    \item the identifier bracketing symbols (we use `\%' for left and right
+identifier brackets),
+    \item the connective symbol (we use `{\tt;}'),
+    \item the reserved words used in the language statements (we set reserved
+symbols in {\bf bold} font).
+\end{enumerate}
+
+The following examples are four valid holon names; the last one is not a
+statement, it is a holon name.
+\begin{itemize}
+    \item Invert matrix \%A\% with bounds \%N\% \%M\%
+    \item Search a free record
+    \item Is the printer ready?
+    \item $X := X+1$
+\end{itemize}
+
+\noindent{\sl Remarks}
+\begin{enumerate}
+    \item \sym{identifier} will be defined inside the data structures section.
+    \item Two holon names are said to be ``identical'' if the symbols of the
+two names match after the following operations:
+    \begin{enumerate}
+        \item Leading and trailing blanks are discarded,
+        \item Strings of consecutive blanks are replaced by one blank symbol,
+        \item The symbols between a left and its corresponding right identifier
+brackets are ignored.
+
+    The following holon names are ``identical'':
+    \begin{itemize}
+        \item Invert matrix \%X\% result in \%Y\%
+        \item Invert matrix \%bobby\% result in \%ok\%
+    \end{itemize}
+    The following are not:
+    \begin{itemize}
+        \item Invert matrix \%A\%
+        \item Invertmatrix \%4\%
+    \end{itemize}
+    \end{enumerate}
+    \item There is not a limit to the length of a holon name; the holon name
+may become a full explanatory text.
+\end{enumerate}
+\clearpage
+\subsection{Holon body}
+
+\begin{tcolorbox}
+\sym{holon body} \is $[$\sym{datatest block}$]$$[$\sym{invariant
+block}$]$\sym{function block}\\
+\sym{function block} \is \sym{holon statements block}\\
+\qquad\alt\sym{holon terminal language statements block}
+\end{tcolorbox}
+
+The important fact of the holon body syntax is the alternative for the writing
+of the \sym{function block}: either like a \sym{holon statements block} or like
+a \sym{holon terminal language statements block}; inside a holon there is no
+mixing \sym{holon statement} (see further definitions) and \sym{holon terminal
+language statement} (see the external syntax).
+
+\subsection{Boolean holon}
+\label{sec:boolean-holon}
+
+If a holon name appears at well-defined positions in holon statements (these
+positions will be defined in the holon statements syntax), this holon is called
+a ``boolean holon.''
+
+A boolean holon must contain at least one boolean expression (written in a
+terminal language); the value ({\sl true} or {\sl false}) of this evaluated
+expression is the value of the boolean holon.
+
+If there is more than one boolean expression, the boolean holon value is the
+value of the last expression.
+
+It will be seen in a following section that the boolean holon may have access
+to variables by value.
+
+It must be clearly understood that a holon becomes a boolean holon by the
+context; nevertheless a holon is either a ``pure'' holon or boolean one. If a
+holon name appears in a spot such that it becomes a boolean one, all
+appearances of this name in places where a boolean holon is not expected is an
+error.
+
+\subsection{Datatest and invariant blocks}
+
+\begin{tcolorbox}
+\sym{datatest block} \is \\
+\qquad\kw{datatest} $($\sym{simple test} \alt \sym{test and error
+recovery}$)^+$ \kw{end}\\
+\sym{simple test} \is \sym{boolean holon name}{\tt;}\\
+\sym{test and error recovery} \is \\
+\qquad\sym{boolean holon name} \kw{else} \sym{holon name}{\tt;}\\
+\sym{invariant block} \is \kw{invariant} \sym{simple test}$^+$ \kw{end}
+\end{tcolorbox}
+
+A data test evaluation is performed according to the following rules: [These
+rules must be executed in this exact sequence]
+
+\begin{enumerate}
+    \item The \sym{test and error recovery} elements are evaluated. For each
+element, the boolean holon is evaluated; if its value is {\sl false} then the
+holon, the name of which follows the \kw{else} is executed.
+    \item If any ``\kw{else} part'' was executed during the Phase 1, we
+re-evaluate all the boolean holons appearing in the \sym{test and error
+recovery} elements.
+    \item The boolean holons of the \sym{simple test} elements are evaluated.
+    \item If one (or more) {\it false} values appear during 2 and 3, the holon
+execution is inhibited and a full report of the data test failure is printed
+out.
+\end{enumerate}
+
+An invariant evaluation is performed according to the number 3 and number 4
+operations of the data test evaluation rule. A data test is evaluated in front
+of its holon execution, an invariant is evaluated inside a holon execution,
+each time a connective symbol is met.
+
+\bigskip
+
+\noindent{\sl Remark}: The syntax doesn't require that the \sym{simple test}
+elements are written after the \sym{test and error recovery} ones. The
+sequencing---according to the evaluation rules---must be made by the compiler.
+The programmer must be aware of that and be careful if you use some kind of
+side-effect in the datatest.
+
+\subsection{Holon statements block}
+
+\begin{tcolorbox}
+\sym{holon statements block} \is
+\kw{begin} \sym{holon statement}$^+$ \kw{end}\\
+\sym{holon statement} \is \sym{sequence}
+\alt \sym{ifthenelse}
+\alt \sym{dowhile}
+\alt \sym{repeat}\\
+\qquad\alt \sym{case}
+\alt \sym{abort function}
+\alt \sym{data structure commands}\\
+\sym{sequence} \is $($\sym{holon name}{\tt;}$)^+$\sym{sequence unit}\\
+\sym{sequence unit} \is \sym{holon name} \alt \sym{abort function}\\
+\qquad\alt\sym{holon name}\sym{abort function}\\
+\sym{ifthenelse} \is \kw{if} \sym{boolean holon name} \\
+\qquad\qquad\qquad\qquad\kw{then} \sym{sequence unit}\\
+\qquad\qquad\qquad\qquad$[$\kw{else} \sym{sequence unit}$]$\\
+\sym{dowhile} \is \kw{do} \sym{holon name} \kw{while} \sym{boolean
+holon}{\tt;}\\
+\qquad\alt \kw{while} \sym{boolean holon} \kw{do} \sym{holon name}{\tt;}\\
+\sym{repeat} \is \kw{repeat} \sym{holon name} \kw{until} \sym{boolean
+holon}{\tt;}\\
+\sym{case} \is \kw{case} $($\sym{boolean holon name} \kw{then}
+\sym{sequence unit} \kw{eor}$)^+$\\
+\qquad\qquad\qquad\qquad\qquad\qquad\qquad\quad\ \phantom{\kw{case} }\kw{else}
+\sym{sequence unit}{\tt;}\\
+\sym{abort function} \is \kw{exit} \alt \kw{stop}
+\end{tcolorbox}
+
+(The \sym{data structure commands} will be described in a following section
+devoted to the data structures.)
+
+In the above syntax, any appearance of the \sym{holon name} means that the
+named holon is executed; any appearance of a \sym{boolean holon name} means
+that the named boolean holon is evaluated.
+
+We shall not describe thoroughly the semantics of the holon statements, because
+the meanings of statements like \sym{ifthenelse}, \sym{dowhile}, \sym{repeat},
+are well known.
+
+An important point is: how do we look at the reserved words?
+
+{\emergencystretch=1em The reserved words may be understood as ``flow of
+control switches''; that is
+the usual interpretation, enforced by the usual flowchart representation of a
+program. Another interpretation is looking to the statements as functional
+units and expressing their meanings using set
+theory.\autocite{mills1972mathematical}\par}
+
+The semantics of the \kw{case} are similar to the semantics of the conditional
+form in LISP. The named boolean holons are evaluated in sequence. The first
+boolean holon, the value of which is {\it true}, implies the execution of its
+associated \sym{sequence unit}. This last execution completes the \kw{case}
+statement. If no boolean holon is {\sl true}, then the last sequence unit is
+executed (the one which follows the \kw{else}).
+
+Introducing an \kw{exit} (or \kw{exitloop}) statement in the programming
+languages isn't presently well-understood. As a matter of fact, nobody has
+given a convincing explanation for its introduction or its rejection. We only
+know that it is possible to write programs without any \kw{exit}, but that the
+\kw{exit} eases the programming for some class of algorithms.
+
+We have adopted the following policy: to admit two ``functions'': the \kw{exit}
+and the \kw{stop}. The \kw{exit} means a local abortion of a holon
+execution. The \kw{stop} implies a complete interruption of a program.
+
+The syntax displays the limited use of the \kw{exit}. It may only appear in an
+\kw{if} or a \kw{case} statement. The \kw{exit} may be viewed as a \kw{goto}
+the last semicolon of a holon body.
+
+In a loop, the \kw{exit} doesn't work like an ``{\sl exitloop}'' statement.
+The syntax implies that the ``repeating part'' of a loop is abstracted in a
+holon name. The ``condition part'' must be abstracted in a boolean holon. If in
+the holon, the name of which is the ``repeating part,'' we use an \kw{exit},
+this \kw{exit} will bring us back to the test of the condition part. An
+example will be described in the appendix.
+
+\subsection{Holon terminal language statements block}
+
+\begin{tcolorbox}
+\sym{holon terminal language statements block} \is \\
+\qquad$($\sym{terminal language designator}\sym{terminal body}$)^+$\\
+\sym{terminal body} \is \\
+\qquad$($\sym{terminal language statement} \alt \sym{data structure
+commands}$)^+$\\
+\qquad\qquad\sym{end of terminal body}
+\end{tcolorbox}
+
+The three undefined elements of this section will be defined in the section
+devoted to the ``Internal Syntax.''
+
+\section{The internal syntax}
+
+The external syntax describes how a holon is made of other holons. This process
+stops when we meet a holon written in one of the terminal languages. The
+terminal languages compose the internal syntax.
+
+\subsection{Holon terminal languages}
+\label{sec:holon-terminal-languages}
+
+These languages contain only operative statements, the meaning of which may be
+generalized by the following expression:
+
+$$X \gets \mathrm{apply}(OP_1,OP_2,OP_3,\ldots ,OP_n)\ \mathrm{to}\
+(Y_1,Y_2,Y_2,\ldots,Y_m)$$
+
+In this expression: $X$ and $Y_i$ are the names of data structures; $OP_i$ is
+the symbol of an operation; ``apply'' is a function, the rules of which are
+well-defined, this function explains the order of the application of operations
+on the data structures.
+
+The expression can be read like this: ``the data structure $X$ takes a new
+value. This value is computed by the application of a set of operations
+$(OP_1,OP_2,OP_3,\ldots,OP_n)$ on the values of data structures
+$(Y_1,Y_2,Y_3,\ldots,Y_m)$. The order of the operations application is defined
+by the function `apply'.''
+
+In this definition, data structure and operation must be understood in a wide
+extent: a line on a printer is a data structure, and the term ``operation''
+includes also functions like  sine, tangent, inverse, rewind, backspace, \dots
+.
+
+Only one thing is forbidden: a control statement. A terminal holon is a
+sequence of expressions to be evaluated. These expression evaluations produce
+results, but a terminal holon never makes a choice.
+
+The expression previously written down isn't a syntax description. It is an
+abstraction of the general meaning of instructions written in a lot of
+languages. For instance, this expression abstracts all the following ones:
+\begin{itemize}
+    \item[] $X \gets A*B+C$
+    \item[] print($Y*Z$)
+    \item[] $Z = \sin ( \cos(2)) $
+    \item[] backspace
+    \item[] \kw{for} $X \gets 1$ \kw{step} $1$ \kw{until} $100$ \kw{do}
+$A[X]\gets 0.0;$
+\end{itemize}
+
+\noindent (The last one isn't a control statement, it is a basic operation for
+an array data structure.)
+
+\medskip
+
+\noindent We can imagine other expressions belonging to the abstract one:
+
+\medskip
+
+List children of Node Tree (A.B.C)
+\begin{itemize}
+    \item[] sort$_\uparrow$(B) \quad ($\uparrow$ meaning ascending order)
+    \item[] sort$_\downarrow$(B) \quad ($\downarrow$ meaning descending order)
+\end{itemize}
+
+To sum up: the internal syntax is made up of a set of so-called ``terminal
+languages,'' the nature of which depends on the program application areas.
+These languages contain only operative statements, and no control statement.
+
+The kinds and number of terminal languages will change from one user to
+another, according to their specific interests. We will have terminal languages
+devoted, for instance, to:
+\begin{itemize}
+    \item Integer Arithmetic
+    \item Real Arithmetic
+    \item Array Manipulation
+    \item Character String Manipulation
+    \item Text Edition
+    \item Input-Output
+    \item Graph Traversal
+    \item Etc\dots
+\end{itemize}
+
+The holon system will include a list of ``standard'' terminal languages, plus
+some ``special application oriented'' terminal languages. A mechanical engineer
+would enjoy a ``gear oriented'' terminal language, etc\dots
+
+Given the peculiar nature of the terminal languages, it is intended to define a
+``generating holon'' which allows the programmer to define his own terminal
+languages. The ``generating holon'' will produce a small compiler for each
+defined terminal language.
+
+\subsection{Defining a terminal language}
+
+To define a terminal language, we must define the following elements:
+\begin{enumerate}
+    \item A ``name'' (the designator): it is a symbol used to point out this
+terminal language among the available terminal languages. A terminal language
+name designates one and only one terminal language (for the same computer
+environment).
+    \item A set of ``terminal data structure types'': i.e., a finite list of
+names with correspondences to machine representation of the concept abstracted
+by the ``type name.'' For instance: {\bf Integer}: 4 bytes.
+    \item A set of ``terminal language operators'': i.e., a finite list of
+symbols which abstract some manipulations and alterations upon data
+structure(s). A description of the kinds of data structures upon which the
+operator applies and also a description of the operator application results
+must be furnished.
+    \item A description of the ``apply'' function for the language: this
+description explains the meaning of complex expressions involving many
+operators and data structure names. (For instance, precedence order rules.)
+This description implies also the definition of an ``end of statement'' symbol
+\end{enumerate}
+
+It must be understood that a sensible design of a terminal language includes
+the definition of ``data structure properties test functions.'' That means
+that, in order to write a powerful datatest, we must have the ability to test.
+For instance, the definition of operations: ``lowbound'' and ``upbound'' which
+we may use to determine the values $(n,m)$ for any array.
+
+\subsection{Some syntax definitions}
+
+We return to the undefined syntax elements appearing in the ``Statements
+block.''
+
+\begin{tcolorbox}
+\sym{terminal language designator} \is \sym{most used language designator}\\
+\qquad\alt \sym{special language designator}\\
+\sym{most used language designator} \is {\tt\#}\\
+\sym{special language designator} \is {\tt\#}\sym{string}\\
+\sym{string} \is \sym{alphanu}\sym{space} \alt
+\sym{alphanu}\sym{alphanu}\sym{space}\\
+\qquad\alt \sym{alphanu}\sym{alphanu}\sym{alphanu}\sym{space}\\
+\sym{alphanu} \is ``an alphabet character or a digit''\\
+\sym{space} \is ``space or blank''
+\end{tcolorbox}
+
+(The last two syntactic definitions aren't BNF for the purpose of shortening
+the exposition.)
+
+    Examples of special language designator:
+    \begin{itemize}
+        \item[] \#GPH \quad standing for a graph language
+        \item[] \#SUR \quad standing for a surveying language
+        \item[] \#GR \quad standing for a gear computations language
+        \item[] \#ARR \quad standing for an array alteration language
+        \item[] Etc\dots
+    \end{itemize}
+
+    What we call the ``most used language'' is in the mind of the users the
+terminal language which would be used the most frequently in terminal holons.
+This language isn't necessarily the same at all places using the Holon
+Programming Language.
+
+
+\begin{tcolorbox}
+\sym{terminal language statement}
+\end{tcolorbox}
+
+We don't describe this part of the syntax, we assume that the % reader can
+% understand from section 5.3.1 what a terminal language syntax must look like.
+reader can understand from the \nameref{sec:holon-terminal-languages} section
+what a terminal language syntax must look like.
+
+\begin{tcolorbox}
+\sym{end of terminal body} \is {\tt\#\#}
+\end{tcolorbox}
+
+\section{Extending the character set}
+
+This section will describe a feasible extension of the concept of terminal
+languages designed by the programmer. This extension was suggested to me by
+reading some of Babbage's Paper published by
+Morrison.\autocite{morrison1961charles}
+
+\subsection{Babbage's language for technical drawing}
+
+Charles Babbage designed and used a language of his own to explain the working
+of the mechanical devices embedded in his calculating engines. What struck me
+reading Babbage's Papers was his clear distinction between a machine's static
+description (blueprint) and a machine's working description (statement in his
+language). Joining a machine's working formal description to a blueprint isn't
+usual.
+
+Babbage explained that the need of this language appeared in proportion as the
+design of his engine progressed. It was the growing complexity of the
+calculating engine design which implies the need of the language describing the
+working of the machine elements. This may be viewed as an application of the
+principles expounded by Simon and Koestler.
+
+They claim the need for a neat distinction between the world as sensed and the
+world as acted. This distinction ensures correct development of complex
+systems.
+
+Now, looking to Babbage's Language, you may infer that with the help of a
+computer, it is feasible to do a lot of things with this syntax; for instance:
+\begin{enumerate}
+    \item To use the working formal description for driving a moving display of
+the mechanical parts on a CRT-Device.
+    \item To expand a ``macro'' description of the working to the complete
+formal one.
+\end{enumerate}
+But any attempt to implement systems like these is a still-born one. Why?
+Because the usefulness of Babbage's syntax depends on the use of a new set of
+small symbols, the reading of which can become as meaningful for a mechanical
+engineer as looking at notes of a score can be for a musician. The mechanical
+engineering oriented reader is urged to read Babbage's paper {\it On a method
+of Expressing by Signs the Action of Machinery}.\footnote{Ibid.}
+
+Considering that the previous example isn't unique, (for instance: think of the
+APL character set), our statement is: in many applications, computer-aided
+systems are cumbersome and awkward because the methods to extend the character
+set are cumbersome and awkward.
+
+People can presently extend the character set only by the use of light-pen (for
+the input) and plotter or CRT (for the output). It is also possible to build
+character sets dedicated to an I/O device like the APL terminal, but this
+method is obviously unflexible.
+
+In the next section, we describe a flexible device to input ``personal''
+character sets.
+
+\subsection{A symbol generator}
+
+The device we describe will be a new combination of existing components. In
+spite of my lack of electronic knowledge, I think that ``wiring'' this device
+wouldn't be a nightmare.
+
+To represent a symbol, we can use a pattern of dots. This Dots-Pattern method
+is already extensively used by many printing devices. We don't care about the
+way (impact, ink spitting, thermal, electrostatic\dots) we use to lay down the
+expected dots-pattern on the paper. We don't care anymore about the pattern
+shape (number of dots); we must have enough dots (perhaps $8\times8$) for
+generating fair copy of ``continuously written'' symbols.
+
+Consider a keyboard composed of three sections:
+\begin{enumerate}
+    \item A standard typewriter (or teletype) keyboard;
+    \item A set of keys with ``undefined'' characters;
+    \item A set of keys to manage the assignment of characters to keys of the
+previous set.
+\end{enumerate}
+Each time we depress a key of the standard keyboard, a dots-pattern of the
+corresponding character appears somewhere (printed on a paper or lighted by LED
+(Light Emitting Diode)) and we assume that the binary-code of this character is
+recorded somewhere.
+
+When we depress a key of the ``undefined'' character set, we can record a
+binary-code corresponding to the depressed key. This binary-code is independent
+of any dots-pattern. When this binary-code appears on an input or output
+device, this appearance can start a search for the corresponding dots-pattern
+in memory. When this dots-pattern is found in memory, its description is used
+to drive the dot-writing device.
+
+The user depressed keys in the third key set to build up the content of the
+memory. For the input device, the support of the memory would be something like
+a magnetic card; each user introduces his own card upon which he can record his
+own character set.
+
+When a user puts a recorded card into the device, the ``undefined'' keys will
+take ``values'' according to the memory card content. That can be displayed to
+the user by fitting into the hollow of each ``undefined'' key a matrix of LED
+Dots which will be turned on according to the memory card content.
+
+The keys of the third set are used mainly to point out the coordinates of the
+dots which must be ``activated'' to form the symbol. The lighted dots would
+appear first on an enlarged dots-display to help the user to draw the symbol.
+Output devices will need memory to manage the mapping of the ``undefined''
+characters into dot patterns. In the output character string, there will exist
+control commands to write content inside the memory of the output device.
+Commands such as: ``The next `X' bytes in this output string must write inside
+the memory.''
+
+\subsection{Use in terminal language}
+
+The programmer defining a new terminal language can build a symbolic syntax
+that ``tightens'' the requirements of the application area. The new symbols can
+stand for operators or data type constants. (This use can simplify some input
+procedure, for instance in hotel reservation systems, the wishes of the
+customer can be input like the conventional ideograms used by this business.)
+
+The set of the new symbols with their meanings---in terms of holons
+(procedures) and data values---will be a part of the terminal language
+definition.
+
+\section{Inner and outer syntaxes}
+
+The Holon statements are used to write the several program levels, all but the
+terminal ones where the programmer uses the terminal languages. The programmer
+can define his personal terminal languages, provided he fulfills the
+requirement that his new syntax corresponds only to an ``operator grammar.''
+
+A program is completed when all the levels are expressed in terms of terminal
+languages.
+
+As a matter of fact, there exists a clear partition between an outer syntax and
+several inner syntaxes.\autocite{wilkes1968outer}
+
+\section{Data structure commands and modified syntax}
+
+This syntax description must be completed by the description of the ``Data
+Structure Commands'' and also of the ``Modified Syntax.'' However, we delay
+these descriptions. The description of the semantics of these syntax elements
+will be more simple after the reading of the next section devoted to the
+representation of structured programs.
+
+%************************************************
+\chapter{Structured Program Representation}
+%************************************************
+
+A structured program may be represented by
+flowcharting,\autocite{mills1972mathematical} but this representation does not
+visualize the several levels if we embed (in the flowchart) the levels in each
+other. A tree representation seems more
+adequate.\autocite{henderson1972experiment} We have chosen a binary tree
+representation for a holon program.\autocite{knuth1968art} This representation
+is used as a model of a program execution and also as a base for the
+implementation of the holon concept.
+
+\section{Binary tree representation}
+
+Figure~\ref{fig:tree} depicts a tree representation of a structured program (on
+the left) with its corresponding corresponding binary tree (on the right).
+
+\begin{figure}
+\begin{center}
+% Figure 1
+\begin{forest}
+for tree={
+% style of nodes in the tree
+draw, semithick, circle,
+       minimum height = 3ex,
+        minimum width = 2em,
+% style of tree (edges, distances, direction)
+     grow = south,
+%forked edge,        % for forked edge
+    s sep = 3mm,    % "sibling" distance
+    l sep = 3mm,    % "level" distance
+ fork sep = 3mm,    % distance from parent to branching point
+}
+[A,fit=band
+[B [E][F]]
+[C [G]]
+[D [H][I]]
+]
+\end{forest}
+\qquad
+% Figure 2
+\begin{tikzpicture}
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (A) {A};
+  \node[vertex,below left=1cm and 0.75cm of A] (B) {B};
+  \node[vertex,below left=1cm and 0.75cm of B] (E) {E};
+  \node[vertex,right=2cm of B] (C){C};
+  \node[vertex, right=1cm of E] (F){F};
+  \node[vertex, below left=1cm and 0.75cm of C] (G){G};
+  \node[vertex,right=1cm of C] (D){D};
+  \node[vertex, below left=1cm and 0.75cm of D] (H){H};
+  \node[vertex, right=1cm of H] (I) {I};
+  \draw[->]
+    (A) edge (B)
+    (B) edge (E)
+    (B) edge (C)
+    (E) edge (F)
+    (C) edge (G)
+    (C) edge (D)
+    (D) edge (H)
+    (H) edge (I);
+\end{tikzpicture}
+\end{center}
+\caption{A structured program's tree and binary tree representations.}
+\label{fig:tree}
+\end{figure}
+
+The contents of the nodes of these trees must be clearly understood: A node
+contains only a holon name, unless the holon is a terminal one (written in
+terminal language); the node corresponding to a terminal holon contains the
+holon name and the terminal instructions.
+
+The holon tree of Figure~\ref{fig:tree} corresponds to the syntactic form:
+\begin{itemize}
+    \item[A] \kw{begin} B; C; D; \kw{end}
+    \item[B] \kw{begin} E; F; \kw{end}
+    \item[C] \kw{begin} G; \kw{end}
+    \item[D] \kw{begin} H; I; \kw{end}
+\end{itemize}
+
+[We temporarily use the ``sequence'' statement only.] Thus, for the binary tree
+we have the following rules:
+\begin{enumerate}
+    \item A node contains a holon name of a terminal holon;
+    \item The left link points to the first statement of the holon body;
+    \item The right link points to the next statement (if any) in the holon
+body.
+\end{enumerate}
+
+\noindent [It can be said that a left link is a graphical correspondence of
+\kw{begin} and the right link is the one of a semicolon which is the
+connective symbol.]
+
+\section{Tree traversal and program execution}
+
+A program execution may be viewed as a tree traversal with respect to some
+order. The order must be chosen so that the execution of the terminal level
+instructions is performed in the correct order. For the binary tree, the
+traversal will be the so-called postorder one (or symmetric one).
+
+This traversal is recursively defined by Knuth:\footnote{Ibid.}
+
+\medskip
+
+\noindent\-\hspace{0.4cm} \kw{if} the tree is empty\\
+\-\hspace{0.7cm} \kw{then} do nothing\\
+\-\hspace{0.7cm} \kw{else} \kw{begin} \\
+\-\hspace{0.9cm} traverse the left subtree;\\
+\-\hspace{0.9cm} visit the root;\\
+\-\hspace{0.9cm} traverse the right subtree;\\
+\-\hspace{0.7cm} \kw{end}
+
+\medskip
+
+We use the following ``refinement'' for the semantic level (holon) ``visit the
+root'':
+
+\medskip
+
+\noindent\-\hspace{0.4cm} \kw{if} the root is a terminal holon\\
+\-\hspace{0.7cm} \kw{then} perform the contained instructions\\
+\-\hspace{0.7cm} \kw{else} do nothing\\
+
+\medskip
+
+If in Figure~\ref{fig:tree}, we assume that nodes E,F,G,H, and I are terminal
+holons, a postorder traversal will start the terminal holon executions in the
+correct order.
+
+Of course, this binary tree model works only for the sequence statement of
+Chapter 5's syntax; but we shall develop the model in order to include the
+other holon statements.
+Nevertheless, the expansion of the model must respect the clear graphical
+representation of the levels that the binary tree allows.
+
+\section{Binary tree representation of the holon statements}
+
+
+\noindent We shall imagine that there exists a ``textual
+index''\autocite{dijkstra1968letters} which is driven by the postorder
+traversal algorithm. When the ``textual index'' enters in a terminal holon, it
+starts the terminal holon statements.
+
+To simulate repetitive statements and conditional statements, we include in the
+binary tree some ``switching'' nodes which will be ``switched'' by boolean
+holon values. These nodes will force the ``textual index'' to re-traverse some
+subtrees or will block the way to some subtrees, according to boolean holon
+values.
+
+[The difference between this model and the flowchart will be the clear
+distinction of the levels.]
+
+The model will be composed from the following types of nodes:
+\begin{marginfigure}[5.05cm]
+    % Figure sidebar
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+  square/.style={regular polygon,regular polygon
+sides=4,semithick,draw=black,fill=white,minimum size=14pt},
+   node distance=2cm, minimum size=14pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (O) {};
+  \node[vertex, below=0.8cm of O] (A) {A};
+  \node[square,below=1cm of A] (C) {\footnotesize C};
+  \node[square,below=0.7cm of C] (F) {\footnotesize F};
+  \node[above right=0.2cm and 0.49cm of F] {\scriptsize DO};
+  \node[square,below=0.7cm of F] (G) {\footnotesize G};
+  \node[above right=0.2cm and 0.48cm of G] {\scriptsize RE};
+  \node[vertex, below=0.95cm of G] (d) {d};
+  \node[vertex, below=0.9cm of d] (r) {r};
+\end{tikzpicture}
+\end{marginfigure}
+\begin{itemize}
+    \item[a] The ``empty node,'' used to fix levelling inside the tree;
+    \item[b] The ``holon name node,'' representing a holon name, (The depicted
+symbol corresponds to a holon, the name of which is: \textsf{A});
+    \item[c] The ``boolean colon name node,'' representing a boolean holon
+name; there are three distinct symbols according to the statement where the
+boolean holon name appears
+    \setlength\itemsep{1.8em}
+    \item[d] The ``dispatching node,'' used to implement a choice;
+    \setlength\itemsep{.8em}
+    \item[e] The ``repeating node,'' used to implement a repetition.
+\end{itemize}
+
+\bigskip
+\subsection{if then else}
+
+\medskip
+\noindent Let the holon statement be:
+
+\medskip
+
+\noindent\-\hspace{0.7cm}\kw{if} H \kw{then} A \kw{else} B.
+
+\medskip
+% Figure 2
+\begin{marginfigure}[1cm]
+\begin{tikzpicture}
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+  square/.style={regular polygon,regular polygon
+sides=4,semithick,draw=black,fill=white,minimum size=26pt},
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (O) {};
+  \node[square,below left=1cm and 0.25cm of O] (H) {H};
+  \node[vertex,right=1.5cm of H] (d){d};
+  \node[vertex, below left=1cm and 0.75cm of d] (A){A};
+  \node[vertex, below right=1cm and 0.75cm of d] (B){B};
+  \draw[->]
+    (O) edge (H.north)
+    (H) edge (d)
+    (d) edge (A)
+    (d) edge (B);
+\end{tikzpicture}
+\caption{Binary tree model for an \mbox{if-then-else} statement.}
+\label{fig:ifthenelse}
+\end{marginfigure}
+
+\noindent The binary tree model is depicted in Figure~\ref{fig:ifthenelse}.
+
+In Figure~\ref{fig:ifthenelse}, the holons defining the boolean holon H and the
+holons A and B must be linked to the corresponding nodes by left linked
+subtrees. H, A, and B are not necessarily terminal holons.
+
+A postorder traversal of the tree in Figure~\ref{fig:ifthenelse} implies the
+following order for the visited nodes: H, A, d, B, ``empty node.''
+
+(When we say that a node is visited, that means that the left subtree rooted by
+this node has been traversed. During this traversal, the terminal nodes are
+executed in the correct order.)
+
+The visit of H gives a value to the boolean holon H (unless there is a
+programming error). The value is used to modify the content of the dispatching
+node links.
+
+A dispatching node may be viewed (see Figure~\ref{fig:dispatch}) as a node with
+four links:
+\begin{itemize}
+    \item Two structural ones which can never be modified during program
+execution
+    \item Two operational ones which are modified by the boolean holon value.
+\end{itemize}
+
+% Figure 3
+\begin{marginfigure}
+\begin{tikzpicture}%
+  [vertex/.style={circle,thick,draw=black,fill=white},
+   hole/.style={draw,shape=circle, semithick, fill=white,minimum size=0.15cm,
+inner sep=0pt},
+   node distance=2cm,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex, thick, minimum size=50pt] (D) {};
+  \node[hole, above left=0.35cm and 0.35cm of D] (NW) {};
+  \node[left=.9cm of NW] (dummywest) {};
+  \node[hole, below left=0.35cm and 0.35cm of D] (SW) {};
+  \node[hole, above right=0.35cm and 0.35cm of D] (NE) {};
+  \node[right=.9cm of NE] (dummyeast) {};
+  \node[hole, below right=0.35cm and 0.35cm of D] (SE) {};
+  \node[vertex, below left=1.9cm and 1.4cm of D] (A) {A};
+  \node[vertex, below right=1.9cm and 1.4cm of D] (B) {B};
+  \node[above right=0.8cm and 0.8cm of D] () {d};
+
+  \node[right=1.3cm of SE] (opkeyleft) {};
+  \node[right=2.5cm of SE] (opkeyright) {};
+  \node[right=0.8cm of opkeyright] {\footnotesize operational link};
+  \draw[semithick,dashed,->] (opkeyleft)--(opkeyright);
+
+  \node[below=0.5cm of opkeyleft] (stkeyleft) {};
+  \node[below=0.5cm of opkeyright] (stkeyright) {};
+  \node[right=0.7cm of stkeyright] {\footnotesize structural link};
+  \draw[semithick,->] (stkeyleft)--(stkeyright);
+
+  \draw[semithick] (NW)--(dummywest.center);
+  \draw[semithick] (NE)--(dummyeast.center);
+  \draw[semithick,->] (dummywest.center)--(A.north);
+  \draw[semithick,->] (dummyeast.center)--(B.north);
+  \draw
+    (D.south)--(D.north)
+    (D.west)--(D.east);
+  \draw[dashed,semithick,->]
+    (SW) edge (A)
+    (SE) edge (B);
+\end{tikzpicture}
+\caption{A dispatching node.}
+\label{fig:dispatch}
+\end{marginfigure}
+
+One of the operational links is ``broken'' according to the boolean holon
+value.
+
+``visit the node'' for a boolean holon will look like:
+
+\smallskip
+
+\noindent\-\hspace{0.4cm}\kw{datatest} has a value been given to the boolean
+holon?
+\kw{end} \\
+\noindent\-\hspace{0.4cm}\kw{begin}\\
+\noindent\-\hspace{0.7cm}operational links $\gets$ structural links;\\
+\noindent\-\hspace{0.7cm}\kw{if} boolean holon value $=$ {\it true}\\
+\noindent\-\hspace{0.9cm}\kw{then} right operational link $\gets$ nil\\
+\noindent\-\hspace{0.9cm}\kw{else} left operational link $\gets$ nil;\\
+\noindent\-\hspace{0.7cm}erase boolean holon value;\\
+\noindent\-\hspace{0.4cm}\kw{end}
+
+\smallskip
+
+The result of the previous operation will be the ``pruning'' of one of the
+subtrees of the labelled -d tree.\marginnote[-0.3cm]{This refers to the
+dispatch node, i.e., one of the branches is pruned.}
+
+\subsection{do while}
+\label{sec:do-while}
+
+Let the holon statement:
+
+\smallskip
+
+\noindent\-\hspace{0.7cm}\kw{do} A \kw{while} C;
+
+\smallskip
+
+\noindent be modeled by the binary tree depicted in Figure~\ref{fig:dowhile}.
+
+% Figure 4
+\begin{marginfigure}
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+  square/.style={regular polygon,regular polygon
+sides=4,semithick,draw=black,fill=white,minimum size=26pt},
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (O) {r};
+  \node[square,below left=1.15cm and 0.75cm of O] (C) {C};
+  \node[vertex,right=1.5cm of C] (d){d};
+  \node[vertex, below left=1.15cm and 0.75cm of d] (A){A};
+  \draw[->]
+    (O) edge (C.north)
+    (d) edge (A);
+\draw[->] (C) -- (d) node [midway, above, xshift=-0.05cm, yshift=-0.15cm] {{\tt
+DO}};
+\end{tikzpicture}
+\caption{Binary tree model for a \mbox{do-while} statement.}
+\label{fig:dowhile}
+\end{marginfigure}
+
+In this case, we use a ``repeating'' node. This kind of node has two structural
+links (the right one points to the tree mapping the holon next statement; it is
+not depicted in Figure~\ref{fig:dowhile}) and one left operational link
+modified by the boolean holon.
+
+The symbol ``do'' on the side of the boolean holon is used to select the
+adequate ``visit the node'' refinement.
+
+This refinement will be:
+
+\smallskip
+
+\noindent\-\hspace{0.4cm}\kw{datatest} has a value been given to the boolean
+holon? \kw{end}
+\\
+\noindent\-\hspace{0.4cm}\kw{begin} \\
+\noindent\-\hspace{0.7cm}d-left operation link $\gets$ d-left structural
+link;\\
+\noindent\-\hspace{0.7cm}\kw{if} boolean holon value $\equiv$ {\it false}\\
+\noindent\-\hspace{0.9cm}\kw{then} \\
+\noindent\-\hspace{1.1cm}d-left operational link $\gets$ nil;\\
+\noindent\-\hspace{1.1cm}r-left operational link $\gets$ nil;\\
+\noindent\-\hspace{0.9cm}\kw{else} do nothing; \\
+\noindent\-\hspace{0.7cm}erase boolean holon value;\\
+\noindent\-\hspace{0.4cm}\kw{end}
+
+\subsection{repeat until}
+
+Let the holon statement:
+
+\smallskip
+
+\noindent\-\hspace{0.7cm}\kw{repeat} B \kw{until} Y;
+
+\smallskip
+
+\noindent correspond to the binary tree shown in Figure~\ref{fig:repeatuntil}
+
+% Figure 5
+\begin{marginfigure}
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+  square/.style={regular polygon,regular polygon
+sides=4,semithick,draw=black,fill=white,minimum size=26pt},
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (r) {r};
+  \node[vertex,below left=1cm and 0.75cm of r] (B) {B};
+  \node[square,right=1.5cm of B] (Y){Y};
+  \draw[->]
+    (r) edge (B)
+    (B) edge (Y);
+\draw node [right=0.6cm of Y,yshift=0.25cm] {{\tt RE}};
+\end{tikzpicture}
+\caption{Binary tree model for a \mbox{repeat-until} statement.}
+\label{fig:repeatuntil}
+\end{marginfigure}
+
+The refinement of the ``visit the node'' for the boolean holon:
+
+\smallskip
+
+\noindent\-\hspace{0.4cm}\kw{datatest} has a value been given to the boolean
+holon? \kw{end}
+\\
+\noindent\-\hspace{0.4cm}\kw{begin} \\
+\noindent\-\hspace{0.7cm}\kw{if} boolean holon value $\equiv$ {\it true}\\
+\noindent\-\hspace{0.9cm}\kw{then} r-left operational link $\gets$ nil;\\
+\noindent\-\hspace{0.7cm}erase boolean holon value;\\
+\noindent\-\hspace{0.4cm}\kw{end}
+
+\subsection{case statement}
+
+Let the holon statement:
+
+\smallskip
+
+\noindent\-\hspace{0.4cm}\kw{case} M \kw{then} Z\\
+\noindent\-\hspace{0.7cm}\kw{eor} N \kw{then} W\\
+\noindent\-\hspace{0.7cm}\kw{eor} \kw{else} T;
+
+\smallskip
+
+\noindent correspond to the binary tree in Figure~\ref{fig:case}.
+
+% Figure 6
+\begin{marginfigure}
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+  square/.style={regular polygon,regular polygon
+sides=4,semithick,draw=black,fill=white, minimum size=26pt},
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (o) {};
+  \node[square,below left=1.25cm and 0.75cm of o] (M) {M};
+  \node[vertex,right=1.2cm of M] (d){d};
+  \node[square,below left=1.25cm and 0.75cm of d] (Z) {Z};
+  \node[square,right=1.2cm of d] (N){N};
+  \node[vertex,right=1.2cm of N] (d'){d};
+  \node[square,below left=1.25cm and 0.75cm of d'] (W) {W};
+  \node[vertex,right=1.2cm of d'] (T){T};
+  \draw[->]
+    (o) edge (M.north)
+    (M) edge (d)
+    (d) edge (N)
+    (N) edge (d')
+    (d') edge (T)
+    (d) edge (Z.north)
+    (d') edge (W.north);
+\end{tikzpicture}
+\caption{Binary tree model for a case statement.}
+\label{fig:case}
+\end{marginfigure}
+
+The ``visit the node'' refinement used for the boolean holon in this statement
+is similar to the one used for the {\it if-then-else} statement.
+
+\section{Full holon representation}
+
+A full holon contains a datatest, an invariant and a sequence of holon
+statements. For instance:
+
+\smallskip
+
+\noindent\-\hspace{0.4cm}N\\
+\noindent\-\hspace{0.4cm}\kw{datatest} \dots \kw{end} \\
+\noindent\-\hspace{0.4cm}\kw{invariant} \dots \kw{end} \\
+\noindent\-\hspace{0.4cm}\kw{begin} S$_1$; S$_2$; S$_3$; \kw{end} \\
+
+\smallskip
+
+The S$_i$ are holon statements (not only holon names). The binary tree is
+displayed in Figure~\ref{fig:fullholon}.
+
+\begin{figure}
+% Figure 8
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+  ell/.style = {% E as ellipse
+    ellipse,semithick,draw=black,fill=white},
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (N) {N};
+  \node[ell,below left=1.25cm and 0.5cm of N] (D) {DATATEST};
+  \node[below left=1.875cm and 0.75cm of D] (D0) {};
+  \node[ell,right=2.5cm of D] (S1) {S$_1$};
+  \node[below left=1.875cm and 0.75cm of S1] (S10) {};
+  \node[ell,right=1.6cm of S1] (I1) {INV};
+  \node[below left=1.875cm and 0.75cm of I1] (I10) {};
+  \node[ell,right=1.6cm of I1] (S2) {S$_2$};
+  \node[below left=1.875cm and 0.75cm of S2] (S20) {};
+  \node[ell,right=1.6cm of S2] (I2) {INV};
+  \node[below left=1.875cm and 0.75cm of I2] (I20) {};
+  \node[ell,right=1.6cm of I2] (S3) {S$_3$};
+  \node[below left=1.875cm and 0.75cm of S3] (S30) {};
+  \node[ell,right=1.6cm of S3] (I3) {INV};
+  \node[below left=1.875cm and 0.75cm of I3] (I30) {};
+  \draw[->]
+    (N) edge (D)
+    (D) edge (S1)
+    (S1) edge (I1)
+    (I1) edge (S2)
+    (S2) edge (I2)
+    (I2) edge (S3)
+    (S3) edge (I3);
+  \draw[dashed,semithick]
+    (D)--(D0)
+    (S1)--(S10)
+    (I1)--(I10)
+    (S2)--(S20)
+    (I2)--(I20)
+    (S3)--(S30)
+    (I3)--(I30);
+\end{tikzpicture}
+\caption{Binary tree model for a full holon.}
+\label{fig:fullholon}
+\end{figure}
+
+The dashed lines are links to the defining holon trees for each of the holon
+components.
+
+The nodes $S_1$, $S_2$, $S_3$ are the roots of left subtrees corresponding to
+holon statement trees. For instance: if $S_1$ is a holon name, the pending link
+points to the definition of this holon in terms of datatest, invariant and
+holon statements; if $S_i$ is a \kw{do while} statement, the node marked $S_i$
+in Figure~\ref{fig:fullholon} is the ``repeating'' node which ``roots'' a {\it
+dowhile} binary tree (see the~\nameref{sec:do-while} section); etc.
+
+[The description of the datatest and invariant representation is given in one
+of the appendices.]
+
+\section{The postorder traversal algorithm revisited}
+
+We can rewrite the refinement of the holon ``visit the node'':
+
+\smallskip
+
+\noindent\-\hspace{0.4cm}\kw{case} node is a terminal one\\
+\noindent\-\hspace{0.7cm}\kw{then} execute the contained terminal language
+statement\\
+\noindent\-\hspace{0.4cm}\kw{eor} node is a repeating one with left operational
+link $\neq$ nil\\
+\noindent\-\hspace{0.7cm}\kw{then} traverse left subtree and revisit this
+node\\
+\noindent\-\hspace{0.4cm}\kw{eor} node is a repeating one (with left
+operational
+link$=$nil)\\
+\noindent\-\hspace{0.7cm}\kw{then} left operational link $\gets$ left
+structural
+link\\
+\noindent\-\hspace{0.4cm}\kw{eor} node is a boolean one\\
+\noindent\-\hspace{0.7cm}\kw{then} operate according to the boolean type (do,
+re,
+empty)\\
+\noindent\-\hspace{0.4cm}\kw{eor} \kw{else} do nothing.
+
+\smallskip
+
+It must be understood that this postorder traversal algorithm can be used to
+``interpret'' the program. The textual index access to and exit from a holon
+can be reported to display the progress and the history of the computation.
+
+\bigskip
+
+\noindent[{\it Remark}: In this section all the algorithms were described
+according to the rules of the holon syntax.]
+
+%************************************************
+\chapter[Mapping the Binary Tree into an Executable Program]{Mapping the Binary
+Tree into an\\Executable Program}
+%************************************************
+
+It must be clearly understood that the syntax of the holon programming
+language is designed in order to write well-structured and well-documented
+programs. A holon name can contain a full explanation of its abstracted
+operation.
+
+We shall explain in this section how this well-structured and well-documented
+program will be mapped into a sequence of efficient machine-code instructions.
+In this instruction sequence, the program structure will not appear explicitly.
+But the code generation will be driven by the program structure.
+
+Each holon will make use of its ``tendency to integration'' during the
+code-generation operation.
+
+\section{Basic integration}
+\label{sec:basic-integration}
+
+Let us consider a holon program with the following properties:
+\begin{itemize}
+    \item[a.] The program is complete: i.e., all the ``leaves'' (the pending
+nodes) of its binary tree representation are holons written in terminal
+languages.
+    \item[b.] The binary tree representation of the program is a minimal one:
+i.e., the definition of a holon appears only in one place in the tree; thus a
+duplication of a holon name does not imply a copy of the subtree rooted by the
+node with the same name.
+    \item[c.] The binary tree representation of the program is a
+left-definition one: i.e., the subtree defining a holon is ``attached'' to the
+leftmost node labelled with this holon name; this means that during a postorder
+traversal using the {\it structural} links, the textual index has access either
+to the subtree defining a holon or to a holon, the defining subtree of which
+has been already traversed.
+\end{itemize}
+[The traversal uses the structural links to avoid any subtree pruning or
+retraversal.]
+
+\noindent We suppose also that:
+\begin{itemize}
+    \item[a.] There exist algorithms to generate machine code for each terminal
+language.
+    \item[b.] We can assign storage addresses for the data structures, and
+these storage addresses are used in the machine code instructions.
+\end{itemize}
+We have the choice to implement each holon: either as a procedure (closed
+routine) or an inline inclusion (open routine). The choice can be based upon a
+series of criteria:
+\begin{enumerate}
+    \item The length of the machine-code generated for the holon.
+    \item The frequency of the holon name appearance in the program.
+    \item The relative cost of a procedure call for the used computer.
+\end{enumerate}
+These three criteria are the expression of the computer architecture influence.
+They are put together in some trade-off function.
+
+Nevertheless, the choice resulting from the trade-off function may be modified
+in some cases, according to the context of a holon name appearance in the
+program. This leads to a new criterion:
+\begin{itemize}
+    \item[4.] The kind of instruction which surrounds a holon name. (For
+instance, after a \kw{do} an open routine can be used instead of a routine
+call.)
+\end{itemize}
+But this last criterion has only a local influence; i.e., the first three
+criteria are used to make a global decision about the implementation unit for a
+holon, but locally, the fourth criterion may modify the choice.
+
+\section{Recursive holon}
+
+The criteria of the previous section can be applied only to non-recursive
+holons. If a holon is a recursive one, it needs a special implementation
+mechanism.\autocite{dijkstra1960recursive} Before applying the criteria, we
+must ``pin'' the recursive holons.
+
+In the conventional languages, the operation is not an easy one. Generally, the
+system is designed to avoid this problem either by assuming that all procedures
+may be recursive (ALGOL-compiler) or by assuming that the programmer will
+specify the recursive procedures (PL/I syntax), the latter choice assumes that
+the programmer is able to specify direct- and cross-recursive procedures.
+
+The only algorithm that I know to detect the recursive procedure is the
+transitive closure one (see Wegner, section
+4.7.6).\autocite{wegner1968programming} This algorithm is simple, but when you
+read the description with an example, you may wonder how it can be manageable
+if the number of procedures is large.
+
+We shall show that if a program is a structured one, we can design a simple
+algorithm to detect recursive holons. [The difference between this algorithm
+and the transitive closure one is that it seems insensitive to the number of
+procedures, with respect to deciding if a procedure is potentially recursive or
+not.]
+
+We suppose that the program has a binary tree representation which is a minimal
+one (see~\nameref{sec:basic-integration}). We assume that we have a list of
+each holon name with a list of its appearances inside the tree. Appearances are
+pointed out by a so-called ``Dewey Binary Notation for Binary
+Trees.''\autocite{knuth1968art} Detecting recursivity will become a simple
+bit-strings comparison.
+
+Suppose a holon A define by Figure~\ref{fig:dewey}.
+
+\begin{marginfigure}[1cm]
+% Figure 9
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},,
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (A) {A};
+  \node[vertex,below left=1.25cm and 0.75cm of A] (D) {D};
+  \node[vertex,right=1.5cm of D] (B){B};
+  \node[vertex,below left=1.25cm and 0.75cm of B] (D') {D};
+  \node[vertex,right=1.5cm of D'] (C){C};
+  \node[vertex,below left=1.25cm and 0.75cm of C] (A') {A};
+  \draw[->]
+    (A) edge (D)
+    (D) edge (B)
+    (B) edge (D')
+    (D') edge (C)
+    (C) edge (A');
+\draw node[left=0.5cm of A,yshift=0.25cm] {{\tt 1}};
+\draw node[left=0.6cm of D,yshift=0.25cm] {{\tt 10}};
+\draw node[left=0.8cm of D',yshift=0.25cm] {{\tt 1010}};
+\draw node[right=0.7cm of B,yshift=0.25cm] {{\tt 101}};
+\draw node[right=0.9cm of C,yshift=0.25cm] {{\tt 10101}};
+\draw node[right=1cm of A',yshift=0.25cm] {{\tt 101010}};
+\end{tikzpicture}
+\caption{A binary tree labeled with Dewey binary notation.}
+\label{fig:dewey}
+\end{marginfigure}
+
+The holon names appearance list is:
+
+\begin{itemize}
+\setlength{\itemindent}{1cm}
+\setlength\itemsep{-0.5em}
+    \item[A:] 1, 101010
+    \item[B:] 101
+    \item[C:] 10101
+    \item[D:] 10, 1010
+\end{itemize}
+
+Is ``D'' recursive?
+
+``D'' appears at nodes 10 and 1010; bit-string comparison (starting from the
+left) shows that the first dissimilar digit is a `1'. This means the second
+appearance of D belongs to the right subtree of the first D. Thus, D is not
+included in its definition (a definition is always a left subtree). Thus, D is
+not recursive.
+
+Is ``A'' recursive?
+
+``A'' appears at nodes 1 and 101010; bit-string comparison shows that the first
+dissimilar digit is a `0'. Thus the second A is included in the left subtree of
+the first A. Thus, A is recursive. But this recursivity implies that B and C
+are recursive, because in a postorder traversal, when the textual index has
+access to the second appearance of A, the traversal of the B and C subtrees is
+not complete.
+
+How do we detect cross-recursivity (like B and C)?
+
+We take the bit-string identification of the second appearance; for A, it is:
+101010. And we extract all the substrings (starting at the left), the first
+bits of which match the bit-string of the first appearance and the last bit of
+which is followed by a `0'.
+
+For the example, this procedure will produce the set of bit-strings:
+\begin{itemize}
+\setlength{\itemindent}{1cm}
+\setlength\itemsep{-0.2em}
+    \item[1]    which corresponds to A
+    \item[101] which corresponds to B
+    \item[10101] which corresponds to C
+\end{itemize}
+[This bit-string comparison is a back-tracking from a descendant to his
+ancestors, in a family lineal chart.]
+
+{\sl Remark}: When we apply the last bit-strings comparison for a more complex
+holon tree, where there are ``repeating,'' ``empty'' and ``dispatching'' nodes,
+these nodes also have Dewey labels. Of course, they must be discarded from the
+computed substring set.
+
+\section{The ``tendency to integration'' feature revisited}
+
+At this point, it is worthwhile to return to the holon's tendency to
+integration.
+
+In the author's opinion, rejection of the structured programming principles is
+often based upon efficiency of the running program. People can argue that
+structured programs, even if they work correctly, will look like laboratory
+prototypes where you can discern all the individual components, but which are
+not daily usable. Building ``integrated'' products is an engineering principle
+as valuable as structuring the design process.
+
+In civil engineering design, it is presently a mandatory concept (that is known
+as the ``Shanley Design Criterion'': collect several functions into one part).
+We may see this principle working by comparing ``web'' iron structured bridges,
+built in the eve of this century, to integrated pre-stressed concrete bridges.
+
+Another example can be found in the rocket design: if you make a cross-section
+of, for instance, the German V-2, you find, going from the outer to the center
+of the section: external skin, structural rods, tank wall\dots; if you cut
+across the Saturn-B moon rocket, you only find an external skin which is at the
+same time a structural component and the tank wall. [Rocketry engineers have
+used the ``Shanley Principle'' thoroughly when they use the fuel pressure
+inside the tank to improve the rigidity of the external skin!]
+
+In modern engineering, the implementation of a system is a modular one when
+there is fear of ``wear and tear'' upon some parts. This kind of fear does not
+exist for a computer program, what happens is the need of ``rewriting'' some
+components because we understand the problem better or because the nature of
+the program application changes.
+
+With the holon concept, a holon can be modified; but then, we rebuild
+(automatically) all the program in order to have a well-integrated program.
+
+\bigskip
+
+\noindent[In the appendix, we give another example of design integration.]
+
+%************************************************
+\chapter{User's View and System Implementation}
+%************************************************
+
+The holon system has two components:
+\begin{enumerate}
+    \item the analyzer, and
+    \item the synthesizer.
+\end{enumerate}
+
+\section{The analyzer}
+
+\noindent This component collects the holons written by the programmer and
+builds the binary tree representation of the program. This binary tree is the
+``logical'' support of the program and it is used to help the programmer to
+design the program. For instance, it permits program interpretative execution.
+The programmer can delete, append, change holons; his program binary tree is
+kept in long-term storage as long as the program design is in progress.
+
+The analyzer checks the syntactic correctness of the programmer's holons.
+If there are several programmers, holons can be protected from illegal
+alterations.
+
+The analyzer outputs a binary tree in a standard format which is a standard one
+for input to a synthesizer. The analyzer points out the recursive holons.
+
+\section{The synthesizer}
+
+\noindent The input of a synthesizer is a complete binary tree for a program,
+the terminal holons of which are all written in terminal languages. It is
+forbidden to synthesize a holon program where there are undefined holons.
+
+The synthesizer produces a machine-code version of the program, using a code
+generator for the used terminal languages and a ``synthesis strategy'' to
+choose the implementation unit for each holon.
+
+The synthesizer chooses the code generator and the synthesis strategy according
+to information given by the programmer about the computer which will run the
+program. (This is only a library retrieval program.)
+
+The output of the synthesizer is a machine-code version of the program, ready
+for execution on a computer.
+
+\section{System control language}
+
+\noindent The programmer uses a language composed of short command reserve
+words to control the analyzer and the synthesizer.
+A description of the syntax of such a language is given in a following chapter.
+
+%************************************************
+\chapter{The Initialization}
+%************************************************
+
+The Data Structure Command Syntax is an attempt to introduce levels in the data
+structure as we have levels for the operations.
+
+We shall first expound the different programming problems which have led to
+this syntax design; next, we shall describe the syntax in a following section.
+
+\section{Abstract data structures}
+
+We want to allow the programmer to use ``Abstract'' data structures; i.e., at
+some level in his program, he declares data structures belonging to an abstract
+type.
+
+An ``Abstract Type'' is a data structure type, the name of which is meaningful
+in the programmer's mind; but, an abstract type doesn't automatically imply a
+machine implementation.
+
+Example: Suppose we are designing a chess playing program; and we use
+extensively the concept of a ``chess-board pattern,'' i.e., a pattern of the
+chess elements. We design a set of operations like: ``Evaluate Chess-Pattern,''
+``Strengthen Chess-Pattern,'' etc\dots At this level in the program design, the
+machine representation of this pattern is irrelevant but we need the concept of
+an ``abstract'' data structure: Chess-Pattern. And according to the operation
+which we shall perform upon a chess-pattern, we will design (refine) the
+abstract data structure to a machine representation.
+(The point is that the obvious implementation of a chess-board by an array
+would probably be a mistake. For instance, it seems that chess-players memorize
+the chess-board in the form of a list structure.\autocite{simon1969sciences}
+Another interesting example is a checker program designed by Strachey; the
+method used to select the checker-board representation is a revealing
+one.\autocite{strachey1966system})
+
+Creation and refining are allowed in the Holon Programming Language by commands
+{\sl create} and {\sl refine}. (See further).
+
+\section{Data structure declaration and scope}
+\label{sec:data-structure}
+
+We have adopted the declaration and scope used in {\sc algol}; nevertheless, in
+top-down programming the {\sc algol} rules must be extended.
+
+{\emergencystretch=1em When we are involved in the refinement of some operation
+(level), the need of
+new variables appears. But, generally the newly-introduced variables have a
+scope larger than the scope of the level where the need of introductions
+appears to the programmer.\par}
+
+Thus, the design of some inner levels implies the alteration of the
+declarations of an outer level. (An example of this programming behavior can be
+noted in programming by stepwise refinements.) At the International Computing
+Symposium '73 at Davos, Prof. Wirth used for displaying the methodology the
+following device: Each refinement is written in one color on a transparency,
+and by stacking the transparencies, we obtain the final program. But, what is
+revealing in the final multi-colored program is that there are some colors
+interspersing and not a genuine embedding of colors. I suppose that the program
+will be reprinted in the Symposium proceedings. Another example may be seen in
+Knuth's letter 1, p 7.\autocite{knuth1973review}
+
+The problem with this kind of programming behavior is how do you manage
+alterations of the program? Obviously, if you decide to delete a level, you
+must delete all the level operations and carefully scan all the ``side''
+modifications implied by this level.
+
+In {\sc hpl},\marginnote{{\sc hpl}: Holon Programming Language} it is possible
+to write declarations, the scope of which is not limited to the scope of the
+holon where the declaration is written. The programmer declares a variable and
+specifies the scope by naming an outer holon. The scope of this holon will be
+the scope of the declared variable. This command is the \kw{declare at level}
+command.
+
+This command works only if the holon which contains the declaration statement
+in its body belongs to the subtree of the holon which defines the variable
+scope.
+
+% Figure 10
+\begin{marginfigure}[3cm]
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},,
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (A) {A};
+  \node[vertex,below left=1.25cm and 0.5cm of A] (B) {B};
+  \node[vertex,right=1.5cm of B] (C){C};
+  \node[vertex,right=1.5cm of C] (E){E};
+  \node[vertex,below left=1.25cm and 0.5cm of C] (D) {D};
+  \node[vertex,right=1.5cm of D] (F){F};
+  \node[vertex,below left=1.25cm and 0.5cm of D] (G) {G};
+  \node[vertex,below left=1.25cm and 0.5cm of F] (H) {H};
+  \draw[->]
+    (A) edge (B)
+    (B) edge (C)
+    (C) edge (D)
+    (C) edge (E)
+    (D) edge (F)
+    (D) edge (G)
+    (F) edge (H);
+\end{tikzpicture}
+\caption{A holon with different scopes.}
+\label{fig:declare}
+\end{marginfigure}
+
+In Figure~\ref{fig:declare}, if we are using a \kw{declare at level} command
+inside holon G, the only levels which can appear in this command are D, C, A.
+To declare a variable at levels B, E, F, and H is not allowed because variables
+declared at these levels can't appear in statements written at level G. The
+analyzer checks the correct use of this command.
+
+Now, let us tackle a new problem: suppose in Figure~\ref{fig:declare} that we
+are designing the body of the holon H. Suppose that we need to use a variable
+declared local to holon G (The holon G was designed before holon H. The meaning
+is that a ``mistake'' was made during the writing of holon G: We did not
+understand that the scope of a variable must be larger than the scope of holon
+G. (It is not exactly a mistake but a lack of program understanding.)
+We shall use inside holon H, the \kw{same as} command, i.e., to declare a
+variable the same as another variable in another holon.
+
+The analyzer will move a ``virtual'' declaration of the variable to a holon
+level which encompasses the two involved holons. (In Figure~\ref{fig:declare},
+this holon level would be level C.)
+
+The declaration at level C is a ``virtual'' one because there is no
+modification of the body of holon G. The alteration of the variable scope is
+local to C; it appears only if H is in the G ``context.'' For instance, see
+Figure~\ref{fig:virtual}; in this holon, there are two appearances of holon G.
+The \kw{same as} command must in this case qualify the G involving holon G
+(for instance, naming G as G \kw{in} D). But the ``virtual'' declaration at
+holon level C has no effect upon the declarations of G \kw{in} M.
+
+% Figure 11
+\begin{marginfigure}
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},,
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (A) {A};
+  \node[vertex,below left=1.25cm and 0.5cm of A] (B) {B};
+  \node[vertex,below left=1.25cm and 0.5cm of B] (M) {M};
+  \node[vertex,below left=1.25cm and 0.5cm of M] (G') {G};
+  \node[vertex,right=1.5cm of B] (C){C};
+  \node[vertex,right=1.5cm of C] (E){E};
+  \node[vertex,below left=1.25cm and 0.5cm of C] (D) {D};
+  \node[vertex,right=1.5cm of D] (F){F};
+  \node[vertex,below left=1.25cm and 0.5cm of D] (G) {G};
+  \node[vertex,below left=1.25cm and 0.5cm of F] (H) {H};
+  \draw[->]
+    (A) edge (B)
+    (B) edge (C)
+    (C) edge (D)
+    (C) edge (E)
+    (D) edge (F)
+    (D) edge (G)
+    (F) edge (H)
+    (B) edge (M)
+    (M) edge (G');
+\end{tikzpicture}
+\caption{A holon with a ``virtual'' declaration.}
+\label{fig:virtual}
+\end{marginfigure}
+
+\section{The initialization}
+
+Watching people writing structured programs, you will notice that most of the
+time, they start the writing of a level like:
+\begin{itemize}
+    \item[] Level XYZ:
+    \begin{itemize}
+        \item[] initialization;
+        \item[] do something;
+        \item[] do another thing:
+        \item[] $\vdots$
+    \end{itemize}
+\end{itemize}
+They will agree that they write the sublevel ``Initialization'' because it may
+happen that it may be used. But really, when they lay down the level name upon
+the paper, they don't know.
+
+If you plan to read the content of this sublevel before the others, the reading
+will be meaningless. As a matter of fact, this initialization level
+conglomerates a lot of operations which must be there in order to respect the
+sequential execution of the program; but why they exist must be discovered by
+the reading of the other levels' bodies.
+
+In our opinion, as the programmer makes choices during the design process,
+parts of the ``initialization'' are implied by these choices. Thus, there
+exists a one-to-one correspondence between each part of the initialization and
+a design choice. Furthermore, in our opinion, the design choices which involve
+initialization are mainly data structure choices. The result is that in {\sc
+hpl}, after a declaration you can write a reserved word (\kw{initial})
+followed by a holon name. The execution of this holon name is performed
+according to the scope assigned to the variable. This is possible even with
+\kw{declare at level}.
+
+\section{Restricting access to data structures}
+\label{sec:restricting}
+
+We will allow the programmer to restrict access to some data structure types to
+a limited set of holons. Variables of the restricted access type can be used
+only by the holons, the names of which appear in the set.
+
+It is also allowed to restrict access for a variable. If this variable belongs
+to a restricted access type, the set of the holons which can use this variable
+must be a subset of the holon list for the restricted access type.
+
+Example:\\
+\kw{create} 1 file \kw{restricted} read; write; purge \kw{end}\\
+\kw{declare} top-secret: file \kw{restricted} write; purge \kw{end}
+
+The checking of all the restrictions is made by the analyzer.
+
+\section{Local refinement}
+\label{sec:local-refinement}
+
+The refinement of an abstract data type may be a local process. For instance,
+we come back to the abstract concept of a ``chess-board pattern'': the way to
+refine this concept in terms of terminal data structures depends upon the
+functions we want applied to this abstract concept.
+
+The programmer designing the holon which will choose the next movement will
+maybe use a list representation of the chess-board; but, obviously the choice
+will seem unacceptable for the programmer writing the holon which prints a
+picture of the chess-pattern, this latter programmer will be very happy to use
+a simple array. Thus, it seems to me to be useful to allow ``local to a holon''
+refinements. In some holons the global refinement is switched to a local one.
+
+(In a previous report, I had called that a ``dedicated refine.'')
+
+\bigskip\noindent
+{\sl Remark}. In the first implementation of {\sc hpl}, I don't plan to
+implement ``Local Refinement,'' because I have not found an acceptable answer
+to the check involved by the local refinement. In short, if locally you change
+the way an abstract type is refined, that implies that variables, the scope of
+which encompasses the two refinements, must be ``trasnlated'' from one
+refinement to the other. You may assume that the programmer must provide the
+translating holon at the right place, but it seems more sensible that the
+analyzer requests these translating holons and decides itself where they must
+go. Think of two programmers writing in parallel two subtrees of a holon where
+they make local refinements; the analyzer would be able to output the correct
+``interface holon'' specifications.
+
+%************************************************
+\chapter{Data Structure Commands Syntax}
+%************************************************
+
+We shall describe the syntax\marginnote{In order to shorten the text, we don't
+use a full BNF description. Most of the syntactic elements will be described
+using plain English.} of:
+\begin{enumerate}
+    \item Type descriptors;
+    \item Variable names;
+    \item The set of commands to build the data structure environment of a
+program.
+\end{enumerate}
+
+\section{Type descriptors}
+\label{sec:type-descriptors}
+
+The type of a variable can be:
+\begin{enumerate}
+    \item either one of the terminal types, i.e., a type belonging to one of
+the terminal language; or
+    \item a structured type.
+\end{enumerate}
+A structured type is an agglomeration of terminal types structured like a tree.
+In this tree, only the ``leaves'' are terminal types. The programmer can give
+names to the nodes; the names correspond to the rooted subtrees and they define
+new types. The several levels of the tree are pointed out by the use of
+numbers. Each time we step down one level in the tree type, the level number of
+the new level must be one unit greater than the level number of the previous
+level.
+
+\medskip
+
+\noindent Example:\\
+1 Human-Body\\
+\begin{tabular}{ l l l l l }
+&2 Head &3 Eyes  &4 Color&\kw{character-string} \\
+&       &3 Hair  &4 Number&\kw{integer}\\
+&2 Arms &3 Number&\kw{integer}\\
+&       &3 Length&\kw{integer}\\
+&2 Legs &3 Number&\kw{integer}\\
+&       &3 Length&\kw{integer}\\
+&2 Trunk&3 Length&\kw{integer}\\
+&       &3 Type  &\kw{character};\\
+\end{tabular}
+
+\medskip\noindent
+The names of the type can be composed of characters and the dash symbol (-).
+
+It is possible to define an Array of Structures, i.e., in the defined type, a
+subtree appears several times at the same level. In this case, only one subtree
+is described associated with a subscript. The subscript is an integer or an
+integer parameter. The subscript is used in declarations to define the number
+of subtrees of this type; it is also used to select one subtree when we make a
+reference to a variable.
+
+{\sl Remark}. (1) It is said that the subscript is an integer or an integer
+parameter (not an integer variable). When we design a new type, we point out
+only the fact that some subcomponents of the tree can be repeated.
+
+Example:\\
+1 \quad Matrix\\
+\-\hspace{1cm}2 \quad Row (\%R\%)\\
+\-\hspace{2cm}3 \quad element-in-row (\%E\%) \kw{real};
+
+In a declaration, values must be given to the parameter; but the given value
+can be the name a pre-declared integer variable.
+
+Example:
+\begin{itemize}
+    \item[] \kw{declare} A, B, C: Matrix($R=N$, $E=M$);
+    \item[] \kw{declare} Z: Matrix($R=S$, $E=4$)
+\end{itemize}
+(2) The introduction of Arrays complicates a little bit the working of the
+\kw{create} command (discussed later).
+
+\section{Variable names (or identifiers)}
+
+A variable name is a string of characters and dash symbols; normally space
+between two words is forbidden. The length is not limited.
+
+When the type of the variable name is a structured one, the programmer can also
+access the subcomponents of the structured type. That is made by the use of the
+reserved symbol \kw{of}. This symbol is used to link components from the
+leaves to the root of the structured type. Nevertheless, there is no
+requirement to give all the links, but the described linkage must be
+unambiguous.
+
+For instance:\\
+After \kw{declare} Dumont, Einstein, Leon: Human\_Body; we can use the
+following variable subcomponent references:
+\begin{itemize}
+    \item[] Number \kw{of} Arms \kw{of} Dumont
+    \item[] Type \kw{of} Leon
+    \item[] Color \kw{of} Hair \kw{of} Einstein
+\end{itemize}
+These three variable references are unambiguous. It must be noticed that only
+the last word of a variable subcomponent reference is a variable name; the
+others (except of \kw{of}s) are type descriptors. The first word stands for a
+terminal type, and the analyzer can check if the forthcoming operation is a
+legal one for this terminal type.
+
+\section{Commands}
+
+\medskip\noindent
+The following commands will be described:\\
+\-\hspace{1cm}\sym{create}, \sym{refine}, \sym{declare}.
+
+\subsection{\sym{create}}
+
+The \sym{create} command is used to create new types in the form of structured
+types or of association of a name to a terminal type. An example of the latter
+is:
+
+\medskip
+
+\-\hspace{2cm} \kw{create} color: \kw{character-string};
+
+\medskip
+
+\noindent Here ``color'' is not a variable, it is a data type. Normally some
+restrictions upon the kind of character-string for ``color'' would be added to
+the create command;\autocite{hoare1972chapter} nevertheless, at this time we
+have not found a suitable syntax for this domain restriction (suitable syntax
+for the programmer {\sl and} the analyzer.
+
+In the former form (creation of structured types), it is not required that the
+programmer writes the structured type thoroughly (from the root to the terminal
+type leaves). The programmer can define abstract types.
+
+Example: \kw{create} 1 chess\_board;
+
+The number ``1'' indicates that it is a structured type, but it is an abstract
+type.
+
+The semantics of this command can be explained like this: when we start the
+writing of a program, the analyzer is aware that the legal type set is the
+``union'' of the terminal types of the terminal languages. Using the create
+command, we can rename terminal types with more ``convenient'' type names for
+our program, or we can really ``stretch'' the type set by ``creating''
+structured types or abstract structured ones. An important fact is that only
+the root of a structured type is added to the type set. If one of
+the~\nameref{sec:type-descriptors} is preceded by the reserved word
+\kw{create}, it becomes an example of structured type creation, but the type
+set is
+augmented by only one element: human\_body. (It will be shown that a
+\kw{declare} command must associate a variable name to a type belonging to the
+type
+set.)
+
+\subsection{\sym{refine}}
+
+The \sym{refine} command is used to transform an abstract structure
+step-by-step into a fully-defined structure. The command syntax is:
+
+\medskip
+
+\-\hspace{0.8cm} \kw{refine} \sym{list of abstract structures} \kw{by}
+\sym{type descriptor};
+
+\medskip\noindent
+It is possible to apply the same refinement to several abstract structures;
+that is the reason for the syntax component \sym{list of abstract structures}.
+
+The programmer must write a level number `1' for each element appearing in the
+list, whatever the actual level number of the abstract structure element. The
+level numbers of the refining types (which follow the \kw{by}) are level
+numbers relative to the level number `1'.
+
+Example:
+
+Suppose we have created the following abstract type:
+
+\medskip
+
+\-\hspace{0.8cm} \kw{create} 1 chess\_board;
+
+\medskip\noindent
+Now, we made a first refinement:
+\medskip
+
+\-\hspace{0.8cm} \kw{refine} 1 chess\_board \kw{by} 2 before\_the\_move \\
+\-\hspace{5.35cm} 2 after\_the\_move;
+
+\medskip\noindent
+Further in the program, we perform new refinements:
+
+\medskip
+
+\-\hspace{0.8cm} \kw{refine} 1 before\_the\_move, 1 after\_the\_move \kw{by}\\
+\-\hspace{3cm} 2 white\_positions \quad 2 black\_positions;
+
+\medskip\noindent
+At this time, the chess-board data type becomes:
+\begin{itemize}
+    \item[1] chess\_board
+    \begin{itemize}
+        \item[2] before\_the\_move
+        \begin{itemize}
+            \item[3] white\_positions
+            \item[3] black\_positions
+        \end{itemize}
+        \item[2] after\_the\_move
+        \begin{itemize}
+            \item[3] white\_positions
+            \item[3] black\_positions;
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+The relative level numbers can be used to add components at one level; for
+instance, suppose we have the following command:
+
+\medskip
+
+\-\hspace{0.8cm} \kw{create} 1 chess\_board\\
+\-\hspace{3cm} 2 before\_the\_move;
+
+\medskip\noindent
+Using the refine command, we write:
+
+\medskip
+
+\-\hspace{0.8cm} \kw{refine} 1 chess\_board \kw{by} 2 after\_the\_move;\\
+
+\medskip\noindent
+The following rules must be respected (to avoid rejection of the command by the
+analyzer): [we write the syntax like ``\kw{refine} A \kw{by} B;'' in order to
+shorten the rule descriptions.]
+\begin{enumerate}
+    \item Elements of the A-list must have appeared before in the program in a
+\kw{create} command or in the B-list of a \kw{refine} command. The ``before''
+must be understood as: in a Holon already ``swallowed'' by the analyzer.
+    \item The refinement must not be a recursive one.
+\end{enumerate}
+A data structure is fully defined when all the refinements have led to terminal
+types.
+
+Refinement of a data type can have a scope; i.e., that locally to some
+specified holons, a type descriptor refinement will be overlaid by a local
+refinement. This local refinement can be restricted to some variables. The
+syntax of this command looks like this:
+
+\medskip
+
+\-\hspace{0.8cm} \kw{Inside} \sym{holon names list}\\
+\-\hspace{3cm} [\kw{for} \sym{variable names list}] \kw{refine} A \kw{by} B;
+
+\medskip\noindent
+Example:
+\medskip
+
+\-\hspace{0.8cm} \kw{Inside} print chess configuration\\
+\-\hspace{2cm} \kw{refine} 1 before\_the\_move, 1 after\_the\_move \kw{by}
+B;\\
+\-\hspace{3cm} 2 \kw{character array} [1:8, 1:8];
+
+\medskip\noindent
+Outside the ``print chess configuration'' this refinement does not apply.
+
+\medskip\noindent
+{\sl Note}: In the first implementation of the holon language, we don't plan to
+implement the~\nameref{sec:local-refinement}.
+
+\subsection{\sym{declare}}
+
+The semantics of a declaration are quite simple: It makes an association
+between a variable name and a type descriptor. But, it also implies the
+definition of a scope for this variable.
+
+In conventional languages, the scope of a variable is determined by the
+position of the declaration of this variable amid the program text. In {\sc
+hpl}, the rule is: A variable declaration appears where the need for this
+variable appears for the first time; and the declaration command is designed to
+explain what is the scope of the variable.
+
+The different forms of the declare command are:
+\begin{itemize}
+    \item[(a)] The ``local declare'' or ``simple declare.'' This command means
+that the scope of the declared variable is similar to the scope of the holon
+which contains the declare command.
+
+    Example:
+
+    \-\hspace{0.4cm} \kw{declare} Spassky, Fischer: Chess\_Board;
+
+    [The type descriptor can be an abstract type; and this declaration can
+appear in the program even if the refinement of the abstract type to a
+structure of terminal types is not finished.]
+
+    The syntax does not require that the declarations are put together in front
+of a holon unit. They may appear anywhere between two holon language
+statements; the analyzer will gather the declaration in due place.
+
+    The type descriptor appearing in a ``declare'' statement must have appeared
+in a ``create'' earlier in the program.
+    \item[(b)] The ``at level declare.'' The logical reason for this command is
+expounded in~\nameref{sec:data-structure}.
+
+    An example of this command:
+
+    \-\hspace{0.4cm} \kw{declare} Einstein: human\_body \kw{at}
+process\_input level;
+
+    [``process input'' is a holon name.]
+
+    The semantics of this statement require that the holon, at the level of
+which the declaration is made, belongs to the ``ancestors'' of the holon where
+the command appears.
+    \item[(c)] The ``same as declare.'' The logical reason for this command is
+expounded in~\nameref{sec:data-structure}. The semantics are also explained in
+that section.
+
+    Example:
+
+\-\hspace{0.4cm} \kw{declare} blackboard:\\
+\-\hspace{1cm}draft \kw{same as} scratch \kw{in} trial first solution;
+
+This example assumes that ``draft'' is a type descriptor, and that ``scratch''
+is a variable which exists in the holon called ``trial first solution.'' The
+type descriptor of the ``scratch'' variable must be the same as the one of the
+declared variable; this is checked by the analyzer. [It is required that the
+variable exists at the level of the holon, the name of which follows the
+reserved word \kw{in}. It is not required that the variable is declared at
+this holon level.]
+\end{itemize}
+Any of the three forms of declaration can contain an \kw{initial} command. The
+following syntactic unit must appear before the connective symbol of the
+declaration:
+\medskip
+
+\-\hspace{0.8cm} \kw{initial} \sym{holon name}
+
+\medskip\noindent
+Example:
+
+\medskip
+
+\-\hspace{0.8cm} \kw{declare} Fischer: chess\_board \kw{at} starting game
+\kw{level initial}\\
+\-\hspace{2cm} put chess set;
+
+\subsection{The ``restricted'' option}
+
+The ``restricted'' option is introduced before the connective symbol of either
+a \kw{create} if we want to restrict access for data types or a \kw{declare}
+if the restriction is for a variable.
+
+If there is more than one holon in the restriction list, the end of the command
+must be specified by an \kw{end}. See examples in~\nameref{sec:restricting}.
+
+\section{The \texorpdfstring{\sym{value}}{<value>} option}
+
+\medskip\noindent
+It was said in the~\nameref{sec:boolean-holon} section that a boolean holon may
+have access variables by ``value.'' In a boolean holon name, the variables
+which we desire to be accessed by ``value'' are pointed out by writing the
+reserved word \kw{value} before the identifier left bracket.
+
+Example: Is matrix \%A\% with bounds \kw{value} \%N\% \kw{value} \%M\% a
+square one?
+
+This concludes the informal description of the ``Data Structure Commands.'' In
+the next chapter, the data structure organization of a holon program will be
+described.
+
+%************************************************
+\chapter{Data Organization in Holon Programming}
+%************************************************
+
+In this section, we shall explain how the data structures are introduced inside
+the holon tree. The goal is to check if each holon appearance in a tree meets a
+suitable data structure environment.
+
+\section{Data structure ordering}
+
+A holon has access to two kinds of data structures:
+\begin{itemize}
+    \item[(a)] Local data structures
+    \item[(b)] Non-local data structures.
+\end{itemize}
+The elements belonging to these sets are issued from different kinds of
+declarations.
+
+We can order the local data structures from holon X:
+\begin{enumerate}
+    \item Declared in the holon X body;
+    \item Declared from holons inner to X;
+    \item Induced at the holon X level by \kw{same as} declarations.
+\end{enumerate}
+
+We can order the non-local data structures for holon X:
+\begin{enumerate}
+    \item Declared in an ``ancestor'' of X;
+    \item Declared non-local from holon X (by a \kw{declare at level});
+    \item Produced by a \kw{same as} declaration.
+\end{enumerate}
+
+The first holon of a program has only local data. A data structure
+``non-local'' to a holon must appear ``local'' in an ancestor of this holon.
+
+\section{The ``initial'' operation}
+
+\medskip\noindent
+Data structures, the declaration of which is followed by the ``initial''
+option, generate links to the initial holons corresponding to these options.
+
+For instance, the following holon text leads to the binary tree representation
+in Figure~\ref{fig:initial}.
+
+\medskip
+
+\-\hspace{0.8cm} A\\
+\-\hspace{0.8cm} \kw{begin} B; \kw{declare} M; C;\\
+\-\hspace{2cm} \kw{declare} N \kw{initial} NI;\\
+\-\hspace{2.5cm} D; \kw{declare} Q \kw{initial} QI;\\
+\-\hspace{1.2cm} \kw{end}\\
+
+\medskip
+\noindent
+[The test is a shortening of another one; B, C, D, NI, QI stand for holon
+names; the type descriptors of the declared variables are omitted.]
+
+% Figure 12
+\begin{marginfigure}
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+  ell/.style = {% E as ellipse
+    ellipse,semithick,draw=black,fill=white},
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (A) {A};
+  \node[ell,below left=1.25cm and 0.5cm of A] (I) {INIT};
+  \node[ell,right=2.5cm of A] (V) {\textit{var}: M,N,Q};
+  \node[ell,below left=1.25cm and 0.5cm of I] (NI) {NI};
+  \node[ell,right=1.6cm of NI] (QI){QI};
+  \node[vertex,right=1.6cm of I] (B){B};
+  \node[vertex,right=1.25cm of B] (C){C};
+  \node[vertex,right=1.25cm of C] (D){D};
+
+  \draw[->]
+    (A) edge (I)
+    (I) edge (B)
+    (B) edge (C)
+    (C) edge (D)
+    (I) edge (NI)
+    (NI) edge (QI);
+  \draw[dashed,->] (A) -- (V);
+\end{tikzpicture}
+\caption{A holon with data structures declared after the ``initial''
+operation.}
+\label{fig:initial}
+\end{marginfigure}
+
+\section{Permanent and non-permanent parts of a holon}
+
+We call the permanent part of a holon:
+\begin{enumerate}
+    \item The holon body,
+    \item The local data structures set.
+\end{enumerate}
+
+We call the non-permanent part:
+\begin{enumerate}
+    \item The non-local data structures set.
+\end{enumerate}
+
+The permanent part has this name because whenever we write the name of a holon
+inside a holon language statement, this permanent part can be attached to the
+binary tree.
+
+The non-permanent part describes the environment required by the holon; the
+description of the environment is a list of variable names with a type
+descriptor. The holon requires finding the same list (except variable names
+which can be different) in any place where its name appears. The name
+non-permanent comes from the fact that the variable names can change.
+
+\medskip\noindent
+{\sl Remark}. The checking of the consistency of the environment with the
+permanent part is really a datatest operation; but this checking can be
+performed completely by the analyzer (at ``compile-time'').
+
+\section{Operations on a program structured by holons}
+
+The operations that a programmer can do during program design are:
+\begin{enumerate}
+    \item To define a new holon;
+    \item To insert in a holon statement an already existing holon which may
+be:
+    \begin{enumerate}
+        \item Fully defined (all its pending nodes are written in terminal
+languages);
+        \item Partly defined;
+    \end{enumerate}
+    \item To write refinements (definitions of inner holons) of a holon, the
+name of which appears in more than one place in the holon tree;
+    \item To delete from the tree:
+    \begin{enumerate}
+        \item A holon name appearance in a holon statement;
+        \item A holon definition (without ``erasing'' the holon name);
+        \item A holon (name and definition).
+    \end{enumerate}
+\end{enumerate}
+
+\section{Use of the non-permanent part of a holon}
+
+When any of the previous operations occurs during the design of a program, the
+analyzer uses the information gathered in the non-permanent part to check the
+environment state required by the operation. The analyzer reports to the
+programmer the reasons why the environment can preclude the completion of an
+operation.
+
+Each holon name node of the binary tree is linked to a non-permanent part
+description which is used by the analyzer.
+
+%************************************************
+\chapter{Running the Synthesizer}
+%************************************************
+
+We shall expound by the use of a simple example how a synthesizer works.
+Suppose the holon program, depicted in Figure~\ref{fig:analyzer}.
+We use a triangle to point out a holon written in terminal language.
+
+% Figure 13
+\begin{figure}
+    \centering
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+   triangle/.style={regular polygon,regular polygon
+sides=3,semithick,draw=black,fill=white, minimum size=29pt},
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (A) {A};
+  \node[vertex,below left=1.25cm and 0.5cm of A] (B) {B};
+  \node[triangle,below left=1.25cm and 0.5cm of B] (E) {};
+  \draw node [below left=1.25cm and 0.5cm of B] {E};
+  \node[vertex,right=1.5cm of E] (F){F};
+  \node[triangle,below left=1.25cm and 0.5cm of F] (G) {};
+  \draw node[below left=1.25cm and 0.5cm of F] {G};
+  \node[triangle,right=1.5cm of G] (H){};
+  \draw node[right=1.5cm of G] {H};
+  \node[vertex,right=3cm of B] (C){C};
+  \node[triangle,right=1.5cm of C] (D){};
+  \draw node[right=1.5cm of C] {D};
+  \node[vertex,below left=1.25cm and 0.5cm of C] (B') {B};
+  \node[vertex,right=1.5cm of B'] (I){I};
+  \node[vertex,right=1.5cm of I] (B''){B};
+  \node[vertex,below left=1.25cm and 0.5cm of I] (F'){F};
+  \node[vertex,right=1.5cm of F'] (M){M};
+  \node[triangle,below left=1.25cm and 0.5cm of M] (D'){};
+  \draw node[below left=1.25cm and 0.5cm of M] {D};
+  \node[triangle,right=1.5cm of D'] (E'){};
+  \draw node[right=1.5cm of D'] {E};
+  \draw[->]
+    (A) edge (B)
+    (B) edge (C)
+    (B) edge (E)
+    (E) edge (F)
+    (F) edge (G)
+    (G) edge (H)
+    (C) edge (D)
+    (C) edge (B')
+    (B') edge (I)
+    (I) edge (B'')
+    (I) edge (F')
+    (F') edge (M)
+    (M) edge (D')
+    (D') edge (E');
+\end{tikzpicture}
+    \caption{A holon program whose triangle-shaped nodes depict holons written
+in a terminal language.}
+    \label{fig:analyzer}
+\end{figure}
+
+The synthesizer generates the integrated program during two tree traversals.
+These traversals will be described by a textual index pointing out the visited
+nodes.
+
+The first traversal is a postorder one. During this traversal, the synthesizer
+generates intermediate code for the terminal holons. Moreover, it evaluates a
+trade-off function, the parameters of which are the length of the intermediate
+code, the length of an eventual procedure call for this holon, the frequency of
+the holon in the program, and the kind of instructions surrounding the holon.
+This evaluation decides the nature of the code integration: ``off-line'' code
+(procedure) or ``in-line'' code (macro).
+
+For instance, in Figure~\ref{fig:analyzer}, we will have the following sequence
+of operations (the letters point out the visited nodes):
+\begin{enumerate}
+    \item E : Generate intermediate code;\\
+              Trade-off function result: off-line (we suppose that).
+    \item G : Generate intermediate code;\\
+              trade-off: in-line.
+    \item H : Generate intermediate code;\\
+              trade-off: in-line.
+    \item F : Trade-off: in-line (given F appears two times in the program,
+this choice is possible if the sum of the code lengths of G and H is small).
+    \item B : The intermediate code for B is composed of the calling sequence
+of procedure B and the code for F. Given B appears three times, we suppose that
+the trade-off result is: off-line.
+    \item B : No-operation because the choice is already made.
+    \item F : No-operation.
+    \item D : Generate intermediate code;\\
+              Trade-off: in-line.
+    \item E : Generate a calling sequence for E.
+    \item M : Trade-off: in-line.
+    \item I : The trade-off gives immediately: in-line because ``I'' appears
+only one time, thus the length of its code is irrelevant.
+    \item B : No-operation.
+    \item C : Trade-off: in-line. (C appears only one time).
+    \item D : No-operation.
+    \item A : We can start the second traversal.
+\end{enumerate}
+The second traversal is a preorder one. The synthesizer will generate the final
+machine code using the information of the permanent and non-permanent data to
+allocate storage and define the addresses or the references through a calling
+sequence.
+
+In the example, the first visited node (after the Node A) is node B. At this
+point, we know that B is off-line, and we generate a calling sequence for B.
+After that, we traverse the left subtree of B, building the code of the
+procedure B. This code starts by a calling sequence of the procedure E,
+followed by the code for this procedure. Next, the implementation of procedure
+B resumes by the generation of the in-line machine code for F. Of course, code
+to jump around the embedded procedures in generated.
+
+The linear sequence of code generated for the holon A will look like:
+$$c(B)\quad B:[\,c(E) \quad E: [\ ] GH\,]\quad c(B)\ GHD\ c(E)\ c(B)\ D$$
+
+Meaning of the symbols:
+\begin{itemize}
+    \item[] $c(X)$ means call of procedure $X$;
+    \item[] $X$: Points out the position of the code of procedure $X$, this
+code is included between the two [ ];
+    \item[] Y: Standing alone (not followed by a colon symbol), means an
+in-line coding of the macro Y.
+\end{itemize}
+The two appearances of D in the symbol string don't mean that the generated
+code at these places is similar; because the addresses used in the instructions
+can be quite different.
+
+Memory for the static data structures is allocated in a pseudo-stack with
+overlapping of the data according to the scopes of the declarations.
+
+The dynamic data structures (for instance, data involved in the recursive
+procedures or data with dynamic bounds) are implemented by a stack.
+
+{\emergencystretch=1em The synthesizer produces (during this second traversal)
+the
+machine-code-translation of the ``control switches'' used by the holon
+statements. The behavior of the integrated program is driven by genuine machine
+jumps and no more by the postorder traversal model used during the
+analysis.\par}
+
+\bigskip\noindent
+{\sl Remark}. It must be noticed that the symbol string used to represent the
+generated code contains only terminal holon names or off-line holon names. All
+the other names used to indicate the program levels disappear.
+
+%************************************************
+\chapter{The Modified Syntax}
+%************************************************
+
+In this section, we shall describe some modifications to the syntax of the
+holon language. These modifications don't fundamentally change the syntax; this
+may be viewed as some alterations made to ease the handwriting of a holon
+program. The relevancy of these changes depends upon the kind of equipment used
+to submit programs to an analyzer. These modifications are for people using a
+card input system. The content of this chapter is irrelevant if you use a
+time-sharing system with a CRT display and some text editing program.
+
+\section{The reserved word ``etc''}
+
+The holon syntax requires that you write the holon name followed by the
+definition (holon body) when you define a holon. Holon names can be very long
+in order to be fully explanatory text.
+
+The reserved word \kw{etc} permits one to (instead of writing a full holon
+name) write only the beginning of the name followed by the word \kw{etc} and
+the parameters if there are any.
+
+For instance:
+\begin{itemize}
+    \item[] Invert matrix \%X\% with bounds \%N\% \%M\%
+    \item[] \quad can be written
+    \item[] Inv \kw{etc} \%X\% \%N\% \%M\%
+\end{itemize}
+There must be enough letters in the abbreviation to avoid ambiguities. In the
+example, if the program contains several holon names beginning by ``Inv,'' the
+submitted abbreviation is rejected by the analyzer. In the output document, the
+input abbreviation is expanded.
+
+\section{The text option}
+
+The programmer can introduce a ``text'' as a part of a holon body. This must be
+written:
+\begin{center}
+    \kw{text} \kw{begin} ``Any text ---'' \kw{end}
+\end{center}
+In this text, the programmer can explain the reason of some design decisions or
+anything like this. In the holon body, the holon names embedded inside the
+holon statements explain how the program works; in the ``text,'' the programmer
+may expound why the program was written in this way. It is a ``comment'' to
+help program readers to understand the logical basement of the program.
+
+\section{Implicit holon names}
+
+The holon syntax requires that, in statements as ``do while,'' ``repeat
+until,'' ``case''---you write the name of one holon for the repeated part of
+the statement.
+
+Example:
+\begin{itemize}
+\setlength\itemsep{-0.3em}
+    \item[] A
+    \item[] \kw{begin} B; \kw{do} C \kw{while} Q; Z; \kw{end}
+    \item[] C
+    \item[] \kw{begin} CA; CB; CC; \kw{end}
+\end{itemize}
+This levelling can be omitted by writing explicitly the definition of the
+``repeat'' part in the statement.
+
+The previous example becomes:
+\begin{itemize}
+\setlength\itemsep{-0.3em}
+    \item[] A
+    \item[] \kw{begin} B;
+    \item[] \quad\quad\quad \kw{do} \kw{begin} CA; CB; CC; \kw{end} \kw{while}
+Q; Z; \kw{end}
+\end{itemize}
+The \kw{begin} and \kw{end} words are used by the analyzer to build correct
+linkages in
+the binary tree.
+
+Holon names ``bracketed'' by \kw{begin} ---\ \kw{end} can appear between the
+following
+symbols:
+\begin{itemize}
+\setlength\itemsep{-0.2em}
+    \item[] \kw{repeat} ---\ \kw{until}
+    \item[] \kw{do} ---\ \kw{while}
+    \item[] \kw{do} ---\ ; \qquad (if we have a statement \kw{while} ---\
+\kw{do} ---\ ;)
+    \item[] \kw{then} ---\ \kw{else}
+    \item[] \kw{else} ---\ ;
+    \item[] \kw{then} ---\ \kw{eor}
+\end{itemize}
+Only holon names can be used between \kw{begin} ---\ \kw{end}, not holon
+statements.
+Likewise, holon names for terminals can be omitted and the statement in
+terminal language is ``bracketed'' by the \# --- and \#\# symbols.
+
+\section{The ``proc'' and ``mac'' options}
+
+The programmer can supersede the decision of the synthesizer by the use of the
+\kw{proc} or \kw{mac} options.
+
+A holon name followed by the reserved word \kw{proc} (\kw{mac}) means that
+the programmer wants the implementation unit for this holon to be a procedure
+(macro), regardless of the synthesizer's choice.
+
+If this reserved word appears in the holon definition, the choice is valid for
+all appearances of this holon in the program. If the reserved word follows a
+holon name inside a holon statement, the choice is valid only at this place.
+
+However, a \kw{mac} option for a recursive holon will always be rejected by
+the synthesizer.
+
+This option allows the programmer to ``contest'' the trade-off function of the
+synthesizer. It may also be used during a new synthesizer design to test the
+trade-off function.
+
+%************************************************
+\chapter{Holon System Control Language}
+%************************************************
+
+We shall describe a holon system control language. This language is an
+``interface'' between the programmer and the implemented version of the
+analyzer and synthesizer which he is using.
+
+\section{Analyzer commands}
+
+The majority of the control language commands deal with the analyzer.
+\begin{itemize}
+    \item[(A)] To start the design of a new program, the programmer uses the
+following command:
+
+    \smallskip
+    \-\hspace{0.3cm}\kw{new program} \sym{holon name} \\
+    \-\hspace{0.6cm}\kw{by} \sym{programmer identification} \kw{end}
+
+    \smallskip
+    The result of this command will be the opening of a file to store the
+future holons of the program and the introduction of a new item in the file
+which lists the undertaken programs.
+    \item[(B)] To access a program, the programmer issues the \kw{program}
+command:
+
+    \smallskip
+    \-\hspace{0.3cm}\kw{program} \sym{holon name} \\
+    \-\hspace{0.6cm}\kw{by} \sym{programmer identification} \kw{end}
+
+    \smallskip
+    If the holon name is recorded as a ``program'' and if the programmer
+identification is a legal one, the analyzer is ready to obey the programmer
+requests.
+    \item[(C)] The \kw{append} command is used to introduce the definitions of
+new holons:
+
+    \smallskip
+    \-\hspace{0.3cm}\kw{append} \sym{holon} \dots \kw{end} \kw{append};
+
+    \smallskip
+    If holons in the ``append'' command have names which don't appear in holon
+statements of other holons, the analyzer keeps these holons in a ``wait list''
+for future use. Each time the analyzer finishes an append session for a
+program, it tries to append the holons which are in the waiting list.
+
+    After that, the programmer receives the following information:
+    \begin{enumerate}
+        \item An edited text of the appended holons;
+        \item A report on syntactic errors;
+        \item The status of the waiting list;
+        \item A list of the undefined holons.
+    \end{enumerate}
+    \item[(D)] The programmer can used the \kw{undefine} command to erase the
+last definition given for a holon. If the erased definition contains names of
+already-defined holons, these latter definitions are not destroyed if these
+holon names appear elsewhere in the program. The command is:
+
+    \smallskip
+    \-\hspace{0.3cm}\kw{undefine} \sym{holon name} \dots \kw{end}
+\kw{undefine};
+
+    \smallskip
+    After an ``undefine'' session, the analyzer reports the list of the
+undefined holons for the program.
+
+    The appearance of the name of a holon existing in the wait list results in
+the complete deletion of this holon: the definition and the name of this holon
+are deleted.
+    \item[(E)] The \kw{change} command is a combination of the two previous
+ones:
+
+    \smallskip
+    \-\hspace{0.3cm}\kw{change} \sym{holon} \dots \kw{end} \kw{change};
+
+    \smallskip
+    For each holon appearing in the ``change'' list, the operations are the
+following ones:
+    \begin{enumerate}
+        \item The previous definition of this holon becomes ``undefined.'' But
+this operation is not conducted like the regular \kw{undefine} command: if the
+erased definition contains names of already-defined holons, these latter
+definitions are not destroyed if these holon names appear elsewhere in the
+program or if they appear in the new definition.
+        \item The new definition is appended.
+    \end{enumerate}
+    The use of this command is mainly the ``remodelling'' of the holon
+statements of a holon.
+    \item[(F)] The following command:
+
+    \smallskip
+    \-\hspace{0.3cm}\kw{output analyzed program} \sym{holon name} \kw{upon}\\
+    \-\hspace{0.6cm}\sym{device description} \kw{by} \sym{programmer
+identification};
+
+    \smallskip
+    is used to obtain the output (according to a standard format) of a program
+(partly or completely finished). The device description points out the support
+of the output: cards, tape, disk, etc.
+    \item[(G)] The reverse operation of the previous one is made by:
+
+    \smallskip
+    \-\hspace{0.3cm}\kw{program} \sym{holon name} \kw{from} \sym{device
+description}\\
+    \-\hspace{0.6cm}\kw{by} \sym{programmer identification};
+\end{itemize}
+
+\section{Synthesizer commands}
+
+\medskip\noindent
+There are two commands:
+\begin{itemize}
+    \item[(A)] The first one is for requesting a program synthesis. The
+programmer gives the name of the requested integration strategy:
+
+    \smallskip
+    \-\hspace{0.3cm}\kw{synthesize} \sym{program name} \kw{with}
+\sym{strategy name} \\
+    \-\hspace{0.6cm}\kw{by} \sym{programmer identification};
+
+    \smallskip
+    \item[(B)] The second one requests the execution of a synthesized program:
+
+    \smallskip
+    \-\hspace{0.3cm}\kw{execute} \sym{program name}\\
+    \-\hspace{0.6cm}\kw{by} \sym{programmer identification};
+
+    \smallskip
+\end{itemize}
+The \sym{programmer identification} is used in all these commands to protect
+the program from illegal users.
+
+%************************************************
+\chapter{Program Example}
+\label{ch:prog}
+%************************************************
+
+In this section, we shall show an example of a program written in the holon
+programming language.
+
+\section{Problem description}
+
+This problem appeared in Dijkstra, Section 16.\autocite{Dijkstra1970-ja} We
+quote here his problem description:
+\begin{quotation}
+    We consider a character set consisting of letters, a space and a point.
+Words consists of one or more, but at most twenty letters. An input text
+consists of one or more words, separated from each other by one or more spaces
+and terminated by zero or more spaces followed by a point. With the character
+valued function RNC (Read Next Character) the input text should be read from
+and including the first letter of the first words up to and including the
+terminating point. An output text has to be produced using the primitive
+PNC($x$) (i.e., Print Next Character) with a character valued parameter.\dots
+The text is to be subjected to the following transformation:
+    \begin{enumerate}
+        \item In the output text, successive words have to be separated by a
+single space
+        \item In the output text, the last word has to be followed by a single
+point
+        \item When we number the words 0, 1, 2, 3,\,\dots in the order from
+left to right (i.e., in which they are scanned by repeated evaluation of RNC),
+the words with an even ordinal number have to be copied, while the letters of
+the words with an odd ordinal number have to be printed in the reverse order.
+    \end{enumerate}
+    For instance (using "\textvisiblespace" to represent a space) the input
+text
+
+    \smallskip
+    \-\hspace{0.1cm}`this\textvisiblespace \textvisiblespace \textvisiblespace
+is\textvisiblespace \textvisiblespace a\textvisiblespace silly\textvisiblespace
+\textvisiblespace program\textvisiblespace \textvisiblespace.'
+
+    \smallskip\noindent
+    has to be transformed into
+
+    \smallskip
+    \-\hspace{0.1cm}`this\textvisiblespace si\textvisiblespace
+a\textvisiblespace yllis\textvisiblespace program.'
+\end{quotation}
+
+\section{The holon program}
+
+The following pages give the holon program written using the modified syntax.
+The holons are written in the order of their design.\clearpage
+
+\noindent odd inversion program\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} find first word starting character;\\
+\-\hspace{0.4cm} \kw{repeat} find a word and print correctly \kw{until} end of
+useful file;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent find first word \kw{etc} \\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} read first symbol;\\
+\-\hspace{0.4cm} \kw{while} last read symbol is a space \kw{do} read next
+symbol;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent find a word \kw{etc} \\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} buffer useful characters;\\
+\-\hspace{0.4cm} print left to right or right to left according to even or
+odd;\\
+\-\hspace{0.4cm} find word terminator and print it and set end of file if full
+stop;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent buffer useful \kw{etc} \\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{repeat} \kw{begin} buffer last read symbol;\\
+\-\hspace{0.7cm} read next symbol;\\
+\-\hspace{0.7cm} \kw{end} \\
+\-\hspace{0.4cm} \kw{until} last read symbol is a space or a full stop;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent find word terminator \kw{etc} \\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{if} last read symbol is a space \kw{then} skip other
+spaces;\\
+\-\hspace{0.4cm} \kw{if} last read symbol is a full stop\\
+\-\hspace{0.7cm} \kw{then} print it and set end of file;\\
+\-\hspace{0.7cm} \kw{else} print a space;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent print left \kw{etc} \\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{if} even word\\
+\-\hspace{0.7cm} \kw{then} print left-right;\\
+\-\hspace{0.7cm} \kw{else} print right-left;\\
+\-\hspace{0.4cm} increase word count;\\
+\-\hspace{0.2cm} \kw{end}
+
+\clearpage
+
+\noindent even word\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{declare} even: \kw{boolean at} odd inversion program
+\kw{level}\\
+\-\hspace{0.4cm} \kw{initial} \# even $\gets$ {\it true} \#\#;\\
+\-\hspace{0.4cm} \# even $\gets$ {\it true} \#\#;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent increase word count\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \# even $\gets$ \kw{not} even \#\#;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent skip other spaces\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{repeat} read next symbol \kw{until} last read symbol is
+not a space;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent read first symbol\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{declare} lrs: \kw{character at} odd inversion program
+\kw{level};\\
+\-\hspace{0.4cm} \# lrs $\gets$ RNC \#\#;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent last read symbol is a space\\
+\-\hspace{0.2cm} \# lrs $\equiv$ '\textvisiblespace\,' \#\#;
+
+\bigskip
+
+\noindent read next symbol\\
+\-\hspace{0.2cm} \# lrs $\gets$ RNC \#\#;
+
+\bigskip
+
+\noindent end of useful file\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{declare} EOF: \kw{boolean at} odd \kw{etc level};\\
+\-\hspace{0.4cm} \kw{initial} \# EOF $\gets$ {\it false} \#\#;\\
+\-\hspace{0.4cm} \# EOF $\equiv$ {\it true} \#\#;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent buffer last read symbol\\
+\-\hspace{0.2cm} \kw{datatest} number of symbols in the buffer less than 20;
+\kw{end}\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{declare} buffer: \kw{character} (20) \kw{at} find a
+word \kw{etc level};\\
+\-\hspace{0.4cm} \kw{declare} pointer: \kw{integer at} find a word \kw{etc
+level};\\
+\-\hspace{0.4cm} \kw{initial} \# pointer $\gets 0$ \#\#;\\
+\-\hspace{0.4cm} \# pointer $\gets$ pointer $+$ $1$; buffer(pointer) $\gets$
+lrs \#\#;\\
+\-\hspace{0.2cm} \kw{end}
+
+\clearpage
+
+\noindent last read symbol is a space or a full stop\\
+\-\hspace{0.2cm} \# (lrs $\equiv$ '\textvisiblespace\,') \kw{or} (lrs $\equiv$
+'.\,') \#\#
+
+\bigskip
+
+\noindent last read symbol is not a space\\
+\-\hspace{0.2cm} \# lrs $\neq$ '\textvisiblespace\,' \#\#
+
+\bigskip
+
+\noindent last read symbol is a full stop\\
+\-\hspace{0.2cm} \# lrs $\equiv$ '.\,' \#\#
+
+\bigskip
+
+\noindent print it and set \kw{etc} \\
+\-\hspace{0.2cm} \# PNC('.\,'); EOF $\gets$ {\it true} \#\#
+
+\bigskip
+
+\noindent print a space\\
+\-\hspace{0.2cm} \# PNC('\textvisiblespace\,') \#\#
+
+\bigskip
+
+\noindent print left-right\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{declare} point2: \kw{integer};\\
+\-\hspace{0.4cm} \kw{initial} \# point2 $\gets$ $1$ \#\#;\\
+\-\hspace{0.4cm} \kw{repeat} \# PNC(buffer(point)); point2 $\gets$ point2 $+$
+$1$
+\#\#\\
+\-\hspace{0.4cm} \kw{until} \# point2 $>$ pointer \#\#;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+\noindent print right-left\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{while} \# pointer $\neq$ $0$ \#\# \kw{do} \\
+\-\hspace{0.7cm} \kw{begin} \\
+\-\hspace{1cm}  \# PNC(buffer(pointer)); pointer $\gets$ pointer $-$ $1$
+\#\#;\\
+\-\hspace{0.7cm} \kw{end} \\
+\-\hspace{0.2cm} \kw{end}
+
+\section{The integrated program}
+
+The synthesizer will produce code for a program equivalent to the one written
+below. In this code, the block structure will be disentangled and the storage
+for all the variables will be allocated on the pseudo-stack.
+
+\bigskip\noindent
+[This intermediate ALGOL-program form doesn't exist in the system; it is only
+said that the generated code will be equivalent to the code generated for the
+following program by an ALGOL compiler.]
+
+\clearpage
+
+\noindent\kw{begin} \\
+\ind{1}\kw{declare} even: \kw{boolean}, lrs: \kw{character}, EOF: \kw{boolean};
+\\
+\ind{1}even $\gets$ {\sl true}; EOF $\gets$ {\sl false};\\
+\ind{1}lrs $\gets$ RNC; \kw{while} lrs $\equiv$ \spchar\ \kw{do} lrs $\gets$
+RNC;\\
+\ind{1}\kw{repeat} \\
+\ind{2}\kw{begin} \\
+\ind{3}\kw{declare} buffer: \kw{character}($20$), pointer: \kw{integer};\\
+\ind{3}pointer $\gets$ $0$;\\
+\ind{3}\kw{repeat} \\
+\ind{4}\kw{if} pointer $\geq$ $20$ \kw{then} (datatest exit);\\
+\ind{4}pointer $\gets$ pointer $+$ $1$;\\
+\ind{4}buffer(pointer) $\gets$ lrs;\\
+\ind{4}lrs $\gets$ RNC;\\
+\ind{3}\kw{until} (lrs $\equiv$ \spchar) \kw{or} (lrs $\equiv$ '.');\\
+\ind{3}\kw{if} even $\equiv$ {\sl true}\\
+\ind{4}\kw{then} \\
+\ind{5}\kw{begin} \kw{declare} point2: \kw{integer}; point2 $\gets$ $1$;\\
+\ind{5}\kw{repeat} PNC(buffer(point2)); point2 $\gets$ point2 $+$ $1$;\\
+\ind{5}\kw{until} point2 $>$ pointer;\\
+\ind{5}\kw{end} \\
+\ind{4}\kw{else} \\
+\ind{5}\kw{begin} \kw{while} pointer $\neq$ $0$ \kw{do} \\
+\ind{6}\kw{begin} PNC(buffer(pointer)); pointer $\gets$ pointer $-$ $1$;
+\kw{end} \\
+\ind{5}\kw{end} \\
+\ind{3}even $\gets$ \kw{not} even;\\
+\ind{3}\kw{if} lrs $\equiv$ \spchar\\
+\ind{4}\kw{then} \kw{begin} \kw{repeat} lrs $\gets$ RNC \kw{until} lrs $\neq$
+\spchar; \kw{end} \\
+\ind{3}\kw{if} lrs $\equiv$ '.'\\
+\ind{4}\kw{then} \kw{begin} PNC('.'); EOF $\gets$ {\sl true}; \kw{end} \\
+\ind{4}\kw{else} PNC(\spchar);\\
+\ind{2}\kw{end} \\
+\ind{1}\kw{until} EOF $\equiv$ {\sl true};\\
+\noindent\kw{end}
+
+\clearpage
+
+\section{Comments}
+
+A. I confess that I made a change after reading Dijkstra's students' answer:
+the holons ``even word'' and ``increase word count'' were written:
+
+\bigskip
+
+\noindent even word\\
+\-\hspace{0.2cm} \kw{begin} \\
+\-\hspace{0.4cm} \kw{declare} wordcount: \kw{integer at} odd inversion
+program \kw{level}\\
+\-\hspace{0.4cm} \kw{initial} \# wordcount $\gets$ $0$ \#\#;\\
+\-\hspace{0.4cm} \# even(wordcount) $\gets$ {\it true} \#\#;\\
+\-\hspace{0.2cm} \kw{end}
+
+\bigskip
+
+\noindent increase word count\\
+\-\hspace{0.2cm} \kw{begin} \# wordcount $\gets$ wordcount $+$ $1$ \#\#
+\kw{end} \\
+
+\medskip
+\noindent
+I had some trouble after writing this because I was afraid of an overflow of
+``wordcount.'' That would require the introduction of a ``datatest'' with error
+recovery in ``increase word count.'' The error recovery would be to ``reset''
+the counter. But with this datatest, the holon ``increase wordcount'' seems to
+be a very cumbersome one. It is not the overflow that really bothers me, but
+that there may be an ``overflow interrupt.'' So I solve all of these problems
+by writing this (retrospectively) incredible holon:
+
+\bigskip
+\noindent
+increase word count\\
+\-\hspace{0.2cm} \kw{begin} \# wordcount $\gets$ [wordcount $+$ $1$] \kw{mod}
+$2$
+\#\# \kw{end}
+
+\bigskip
+\noindent
+It was the wordcount \kw{integer}\ declaration that hindered me from thinking
+about a
+boolean variable.
+
+\medskip
+\noindent
+B. The reader may think that the result of the work is a very verbose program.
+That is true, but the holon program explains the process in a different way
+from a ``normal'' program:
+\begin{enumerate}
+    \item The logic of the program answer to the problem is contained in the
+program text. You don't need to disentangle this logic from the instruction
+sequence.
+    \item The program text is self-explanatory.
+\end{enumerate}
+
+\medskip\noindent
+C. Normally, with a real holon system, the programmer would submit his
+first-written holons and receive (for instance, on punch cards which he shall
+put in front of the definition) the list of the undefined holons.
+
+\medskip\noindent
+D. Advice on the usefulness of the system must not be established by the fast
+that for so small a problem, the generation of the holon answer seems longer
+than with a normal language. It is better to ask oneself: ``\dots and when
+faced with a program a thousand times as large, should I compose it in the same
+way?''\footnote{Ibid.}
+
+\medskip\noindent
+E. The use of the ``datatest'' must be noticed. It is put at its place as a
+``fire-wall'' for the program.
+
+Reading Knuth's version of the program suggests that it would be more sensible
+to write a ``datatest'' with the error-recovery
+option.\autocite{knuth1973review} The processing of the string will continue
+even after a ``too long word.'' For instance:
+
+\bigskip\noindent
+\ind{1}\kw{datatest}\\
+\ind{2}number of symbols in the buffer less than 20\\
+\ind{2}\kw{else} \kw{begin} \\
+\ind{3}print a quoted buffer;\\
+\ind{3}reset pointer to zero;\\
+\ind{2}\kw{end} \\
+\ind{1}\kw{end}
+
+\bigskip\noindent
+With this datatest the following odd word:
+
+\medskip
+\ind{1}thiswordislongerthantwentycharacters
+
+\medskip\noindent
+will print as:
+
+\medskip
+\ind{1}``thiswordislongerthan''sretcarahcytnewt
+
+\bigskip\noindent
+[I forgot in the program to write the refinement of the datatest. Normally,
+this must be written.]
+
+%************************************************
+\chapter[Macro-processing of Holon Name Parameters]{Macro-processing of Holon
+\\ Name Parameters}
+%************************************************
+
+The previous-described syntax allows only the use of parameters for variables.
+Parameters can be used for holon names provided we macro-process holon
+definitions if there is a holon name parameter.
+
+For instance, the postorder traversal of a binary tree is an algorithm which
+appears frequently in this survey; the semantics of ``visit the node'' is the
+only change. One may imagine a super-holon: ``traverse binary tree in postorder
+using \%holon\% for visiting the node.''
+
+Each appearance of this holon will produce an expansion of its body, in order
+to build the whole program tree structure.
+
+For the time being, we don't plan to implement this feature in the first
+version of the holon language.
+
+%************************************************
+\chapter{Holon Parallel Programming}
+%************************************************
+
+Reading the book of Brinch Hansen\autocite{hansen1973operating} and Hoare's
+paper,\autocite{hoare1972towards} it appears to me that it would be interesting
+to study if, with some modifications, the holon language can be used to program
+parallel processes. As a matter of fact, the language was not designed with
+this purpose in mind.
+
+I have not studied thoroughly this extension, at the present time.
+Nevertheless, some of Hoare's requirements seem to be fulfilled more or less
+easily:
+\begin{enumerate}
+    \item The \kw{cobegin} and \kw{coend} notation for disjoint processes.
+Moreover, the non-permanent parts of the co-processed holons can be used to
+check the disjointness at analyze-time.
+    \item The \kw{exit} statement as it is defined (\kw{goto} the end of a
+holon) fulfills the ban of jump out of a parallel statement (the parallel
+statement is a co-holon).
+    \item The ``when B'' condition would be a datatest with the error recovery
+option: \kw{datatest} B \kw{else} waiting \kw{end}.
+    \item The ``array remapping'' may be interpreted as a local refinement.
+\end{enumerate}
+This section is only a hint to an eventual extension of the holon language.
+
+%************************************************
+\chapter{Holon Operating System}
+%************************************************
+
+\section{Introduction}
+
+We want to use the fact that we know the structure of a program in order to
+manage a virtual memory system. Since we have a structured program, we have a
+better knowledge of the behavior of the program. We can determine exactly the
+future behavior of a program; we want to use this information to build a system
+furnishing its working set beforehand to a program. Among the instructions of a
+program, there will be some page transfer requests; but, those requests are
+written automatically in due places in order to avoid page faults; the Holon
+Operating System will prepare a suitable working set for each executed program.
+
+\section{Paging of a holon program}
+
+The terminal levels, linked by some suitable code corresponding to the machine
+code for the holon language statements
+(\kw{if} \dots\kw{then} \dots\kw{else} \dots\kw{do} \dots\kw{while}
+\dots\kw{etc} \dots) are ``paged.'' These
+pages correspond to the operational (or functional) part of the program; now,
+we must also ``page'' the data structure, for that purpose we manage two
+different memory zones: a paged stack and a paged pseudo-stack.
+
+In the pseudo-stack, we will put all the variables---the dimensions and the
+number of which may be known at compile time (this includes all the variables
+except the ones appearing in arrays with dynamic bounds and in recursive
+procedures). The variables in the pseudo-stack are ``overlaid'' if it is
+possible; for instance the two component variables of an if-then-else clause
+are overlaid. But the maximum length of this pseudo-stack may be known at
+compile time. And at any point in the program, we may specify what is the
+length of the used part of the pseudo-stack.
+
+Now, in the stack we put all the data, the number or the dimensions of which
+depend on the computation (dynamic arrays, data local to recursive procedures).
+
+The difference between the two stacks is: we take two computation points in the
+program (two different positions of a textual index), for instance $p_1$ and
+$p_2$, with the following condition: $p_2$ is to the right of $p_1$ in the
+holon tree (the meaning of which is: there are some computations to do for
+moving the textual index from point $p_1$ to $p_2$); now we call $\psi(p_1)$
+and $\psi(p_2)$ the extents of the pseudo-stack at point $p_1$ and $p_2$, and
+in the same way S1 ($p_1$) and S1($p_2$); $\psi(\pi)$ is a fixed value not
+correlated to the input data string; but S1($\pi$) depends on the input string.
+
+Now, look at Figure~\ref{fig:op}---it represents a holon program with its code,
+and the two ``paged'' stacks. (Remark: we suppose temporarily that there exists
+only in-line code.)
+
+% Figure 14
+\begin{figure}
+    \centering
+
+\begin{tikzpicture}%
+  [vertex/.style={circle,semithick,draw=black,fill=white},
+   node distance=2cm, minimum size=20pt,
+   on grid,
+   >=latex,>={Stealth[inset=0pt,length=6pt,angle'=28,round]}
+  ]
+  \node[vertex] (A) {A};
+  \node[vertex,below=1.2cm of A] (B) {B};
+  \node[vertex,below=1.2cm of B] (E) {E};
+  \node[vertex,right=1.2cm of E] (F) {F};
+  \node[vertex,below=1.2cm of E] (one) {1};
+  \node[vertex,below=1.2cm of F] (two) {2};
+  \node[vertex,right=2.4cm of B] (C) {C};
+  \node[vertex,below=1.2cm of C] (G) {G};
+  \node[vertex,right=1.2cm of G] (H) {H};
+  \node[vertex,below=1.2cm of G] (three) {3};
+  \node[vertex,below=1.2cm of H] (four) {4};
+  \node[vertex,right=2.4cm of C] (D) {D};
+  \node[vertex,below=1.2cm of D] (I) {I};
+  \node[vertex,right=1.2cm of I] (J) {J};
+  \node[vertex,below=1.2cm of I] (five) {5};
+  \node[vertex,below=1.2cm of J] (six) {6};
+  \node[vertex,right=1.2cm of J] (K) {K};
+  \node[vertex,below=1.2cm of K] (seven) {7};
+  \draw[->]
+    (A) edge (B)
+    (B) edge (E)
+    (E) edge (one)
+    (E) edge (F)
+    (F) edge (two)
+    (B) edge (C)
+    (C) edge (G)
+    (G) edge (H)
+    (G) edge (three)
+    (H) edge (four)
+    (C) edge (D)
+    (D) edge (I)
+    (I) edge (five)
+    (I) edge (J)
+    (J) edge (six)
+    (J) edge (K)
+    (K) edge (seven);
+
+    % Code pages
+    \node[below left=1cm and 0.4cm of one] (cptopleft) {};
+    \node[right=8.4cm of cptopleft] (cptopright) {};
+    \draw[semithick] (cptopleft.center)--(cptopright.center);
+
+    \node[below=0.6cm of cptopleft] (cpbotleft) {};
+    \node[right=8.4cm of cpbotleft] (cpbotright) {};
+    \draw[semithick] (cpbotleft.center)--(cpbotright.center);
+
+    \foreach \x in {0,...,14}
+        \draw[semithick]
+([xshift=\x*0.6cm]cptopleft.center)--([xshift=\x*0.6cm]cpbotleft.center);
+
+    \node[below right=0.3cm and 0.6cm of
+cptopright,align=left,font=\footnotesize\sffamily]
+    {Code\\pages};
+    % PS Pseudo-Stack Pages
+    \node[below=0.55cm of cpbotleft] (pstopleft) {};
+    \node[right=6.6cm of pstopleft] (pstopright) {};
+    \draw[semithick] (pstopleft.center)--(pstopright.center);
+
+    \node[below=0.6cm of pstopleft] (psbotleft) {};
+    \node[right=6.6cm of psbotleft] (psbotright) {};
+    \draw[semithick] (psbotleft.center)--(psbotright.center);
+
+    \foreach \x in {0,...,11}
+        \draw[semithick]
+([xshift=\x*0.6cm]pstopleft.center)--([xshift=\x*0.6cm]psbotleft.center);
+
+    \node[below right=0.3cm and 1.3cm of
+pstopright,align=left,font=\footnotesize\sffamily]
+    {PS Pseudo-stack\\pages};
+
+    % S Stack Pages
+    \node[below=0.55cm of psbotleft] (stopleft) {};
+    \node[right=4.2cm of stopleft] (stopright) {};
+    \draw[semithick] (stopleft.center)--(stopright.center);
+    \node[below=0.6cm of stopleft] (sbotleft) {};
+    \node[right=4.2cm of sbotleft] (sbotright) {};
+    \draw[semithick] (sbotleft.center)--(sbotright.center);
+    \foreach \x in {0,...,7}
+        \draw[semithick]
+([xshift=\x*0.6cm]stopleft.center)--([xshift=\x*0.6cm]sbotleft.center);
+    % dashed extension
+    \node[right=6.6cm of stopleft] (stopfarright) {};
+    \node[right=6.6cm of sbotleft] (sbotfarright) {};
+    \draw[semithick,dashed] (stopright.center)--(stopfarright.center);
+    \draw[semithick,dashed] (sbotright.center)--(sbotfarright.center);
+
+    \node[below right=0.3cm and 1.1cm of
+stopfarright,align=left,font=\footnotesize\sffamily]
+    {S Stack pages};
+\end{tikzpicture}
+    \caption{A holon program with its corresponding pages and ``paged''
+stacks.}
+    \label{fig:op}
+\end{figure}
+
+The pagination of the seven terminal holons is made like this: the code of the
+terminal holons composes a string of machine code and we break the string,
+putting the first $x$ words in the first page, the next $x$ words in the second
+page, etc.; i.e., the paging isn't related to the structure of the program.
+
+Now, in the next section, we shall see how a Holon Operating System would work.
+
+\section{Monitoring the page transfers}
+
+We shall call the ``working set for a holon'' the code and data pages needed by
+a holon to avoid any disruption during the computation. The important feature
+of the holon tree is that the ``working set'' is almost---because of
+S---well-defined. For instance, in Figure~\ref{fig:op}, the working set for
+holon A is composed of all the code and PS pages, plus an amount of S pages
+(this amount is not known, but the holon's need of some space (some pages) in
+the S stack may be known). Now, the working set of the holon B is composed of
+the pages needed to perform the computation involved in the holon B, but also
+the first pages needed by holon C to start its computation: we need the last
+ones because we must avoid disruption not only during the holon computation,
+but also between two holons.
+
+As long as a holon computation progresses, the holon may also indicate the
+pages it doesn't need anymore.
+
+With these two operations in mind (a holon may make page requests in advance; a
+holon may also indicate the pages to be dropped), it may be understood that we
+may build a holon operating system where, as much as possible, the program's
+behavior is managing the page requests.
+
+\section{Structure of the computer}
+
+We need a computer with an internal paged store, and (probably) with a
+two-level back store. [The matter of the number of levels will appear further
+on, because in the Holon Operating System it will appear that the page size
+will be determined by the transfer speed between the levels of the store
+hierarchy.]
+
+We need also a ``monitor,'' this will be either a program or a small hardware
+computer. The purpose of the monitor is: to receive the page requests from the
+running programs and to manage the transfer of the pages.
+
+\section{Fundamental structure of the paging algorithm}
+
+[The following description is a sketch---it is the departure point of a study.]
+
+We first suppose that the processor is allocated to the different processes
+according to a scheduling policy. Each holon will request its working set
+before starting execution. Nevertheless, the monitor will discard requests from
+``overly ambitious'' holons. The definition of an ``overly ambitious'' holon is
+up to a computer center manager---it will depend on the average job profile;
+and, for instance, the ``overly ambitious'' barrier may be changed during the
+day.
+
+If a holon is discarded (because it is overambitious), the hierarchic levels of
+this holon are stepped down until the first ``moderate'' holon is found; its
+page requests are obeyed as soon as possible and this holon starts running.
+Now, during its execution, it will request pages in advance and the monitor
+will try to bring these pages in time; it is also the holon program that points
+out the pages which may be overlaid by others, because it doesn't need them
+anymore. It is only in case of emergency (deadlock) that the monitor decides to
+remove a page not released by a holon.
+
+\section{Working set for the fundamental instructions}
+
+\subsection{If-then-else statement}
+
+Suppose the statement `\kw{if} Q \kw{then} T \kw{else} F; next;' (`next' is not
+necessarily
+a holon name; it may be another holon statement).
+
+Suppose that we have the following paginations: (We consider only ``code
+pages'')
+\begin{itemize}
+    \item[] Q\,: $Q_1\ Q_2\ Q_3\cdots Q_N$ pages
+    \item[] T\,: $T_1\ T_2\ T_3\cdots T_N$ pages
+    \item[] F\,: $F_1\ F_2\ F_3\cdots F_N$ pages
+    \item[] next\,: $N_1\ N_2\cdots N_X$ pages
+\end{itemize}
+The working set for the if-then-else statement is: ($Q_1\ Q_2\cdots T_1\ F_1$);
+like this, the statement will be executed without disruption. The test is made
+and the first page of both parts of the alternative are included; in the
+beginning of the $T_1$ page, for instance, there will be requests to the
+monitor:
+\begin{enumerate}
+    \item Page from $F_1$ may be overlaid,
+    \item Please bring the following pages into the internal core:
+$T_2,\allowbreak T_3,\allowbreak T_4,\ldots\allowbreak T_M,\allowbreak N_1$.
+\end{enumerate}
+Without waiting for the answer to the request, we start the execution of the
+$T_1$ page instructions.
+
+\medskip\noindent
+{\sl Remark}. The requested pages depend on the nature of the holon T; if this
+one is a new if-then-else statement, then the requested pages will correspond
+to the if-then-else working set. In this case, we have brought into memory and
+unused page (in the example: $F_1$), but that is not a problem, as we don't
+want to reduce its minimum number of page transfers during a program
+execution---we want to limit to a minimum the number of page faults.
+
+\subsection{Case statement}
+
+It appears that the case statement may be managed in the same way as the
+if-then-else statement.
+
+\subsection{Repeat and while statements}
+
+Suppose statement `\kw{repeat} P \kw{until} Q; next;' with the pagination:
+\begin{itemize}
+    \item[] P\,: $P_1\ P_2\ P_3\cdots P_N$
+    \item[] Q\,: $Q_1\ Q_2\ Q_3\cdots Q_N$
+    \item[] next\,: $N_1\ N_2\ N_3\cdots N_X$
+\end{itemize}
+The working set is: ($P_1\ P_2\cdots P_N\ Q_1\cdots Q_N\ N_1$). In fact the
+selected $P_i$ will depend on the $P$ statement type; but normally (except
+tying up the internal memory) the deletion of pages will be delayed until
+reaching the beginning of the page $N_1$.
+
+Example: In the if-then-else statement, when we reach $Q_2$, we may request
+deletion of $Q_1$; but if this statement is embedded in a repeat statement,
+this deletion is not sensible, because it will overload the page transfer
+mechanism. In the same way, embedded \kw{repeat} statements lead to fixed
+pages.
+
+\section{Maximum number of pages fixed}
+
+In the previous section we presented a memory policy management that is
+program-oriented, because it is the program itself that requests pages and also
+deletes them according to its needs (the monitor preempts pages only if the
+pages fixed by the processes tie up the internal memory.) There exists another
+policy: to fix a maximum for the number of code pages allocated to a process.
+Because we have structured programs, in front of each page we may, at
+compile-time, write the list of the ($n-1$) pages requested to work ($n$ is the
+maximum number allowed) and the list of page modifications for the pseudo-stack
+and the stack. With this policy, we have a deletion each time we leave a page,
+followed by a page transfer (except in the case where we are in a \kw{repeat}
+statement, the extent of which is less than $n$; see the following example.
+
+\begin{marginfigure}
+\begin{tikzpicture}%
+  [node distance=2cm, minimum size=20pt,
+   on grid,
+  ]
+    \node (pstopleft) {};
+    \node[right=6cm of pstopleft] (pstopright) {};
+    \draw[semithick] (pstopleft.west)--(pstopright.west);
+
+    \node[below=0.6cm of pstopleft] (psbotleft) {};
+    \node[right=6cm of psbotleft] (psbotright) {};
+    \draw[semithick] (psbotleft.west)--(psbotright.west);
+
+    \foreach \x in {0,...,10}
+        \draw[semithick]
+([xshift=\x*0.6cm]pstopleft.west)--([xshift=\x*0.6cm]psbotleft.west);
+    \foreach \x in {1,...,10}
+        \node[xshift=\x*0.6cm-0.67cm,yshift=-.29cm] {\x};
+\end{tikzpicture}
+\caption{A program with 10 pages.}
+\label{fig:pages}
+\end{marginfigure}
+
+In Figure~\ref{fig:pages}, pages $1$, $2$, and $3$ compose a \kw{repeat}
+statement. We
+list the page requests for $n=5$ on entry in:
+\begin{itemize}
+\setlength\itemsep{0.1em}
+    \item[$1$:] $1,2,3,4,5$
+    \item[$2$:] $2,3,1,4,5$
+    \item[$3$:] $3,1,2,4,5$
+    \item[$4$:] $4,5,6,7,8$
+    \item[$5$:] $5,6,7,8,9$
+\end{itemize}
+
+This example shows that there is no transfer and deletion until we reach the
+head of page 4: but at that time, we have to transfer 3 pages; and if by chance
+the \kw{repeat} statement covers exactly 5 pages, then there will be a page
+fault.
+
+\section{Priorities in the resources used by a program}
+
+The page-management policy, in our opinion, consider that the pages used for
+the pseudo-stack and the stack are never preempted, for several reasons:
+\begin{enumerate}
+    \item The cost of a page removal is higher for a data page than for a code
+page because removal of the former implies a copy in the back store; the latter
+allows immediate overlay;
+    \item If we delete some data pages of a running process, we will have
+data-originated fault pages.
+\end{enumerate}
+On the other hand, we may use the number of data pages and of code pages
+requested by a program to establish dynamic priorities between the programs:
+for instance, the program time slice may be proportional to its number of code
+pages, i.e., we give more time to the programs involved in loop computations;
+or we may sort the program waiting queue according to the number of data pages,
+i.e., we give priority to the ``memory monopolizing'' programs.
+
+\section{Page size}
+
+In order to respect the philosophy of the system, the page size will be chosen
+according to the performance of the page transfer device and of the monitor
+program: the transfer time for a page must be less than the average execution
+time of the instructions contained in one page (in order to avoid disruption of
+a process computation).
+
+This requirement may limit the application of this kind of operating system to
+computers using ``slave memory'' (like the {\sc ibm} 360/85 cache store) or
+``distributive memory'' (for instance, one level of standard core memory, the
+next level being large capacity store LCS, the last one a drum). The previous
+discussion explains the kind of policy that would be used to move the pages
+between the different levels of the memory hierarchy.
+
+\section{Deadlock}
+
+The approach presented in previous sections must be studied to understand how
+it may lead to a deadlock; this deadlock is owing to requests for data pages
+when there is no free page frame. But it seems that in this case, preemption of
+a job would solve the problem. (Deadlocks due to peripherals are another
+problem.)
+
+\section{Conclusion}
+
+This is only an outlook of what may be done about a holon operating system; the
+profit of the use of the structured programming methodology would be enhanced
+by the improved performance of computer systems.
+
+\section{Some additional comments about the holon operating system}
+
+Hoare and McKeag reject the possibility of prepaging.\autocite{hoare1972survey}
+The first reason is the inability to have a significant knowledge of the future
+behavior of the programs. The second one is that the rate of a program
+execution in a multiprogramming environment is unknown.
+
+Nevertheless, it seems that prepaging through the monitor control can be
+feasible with some kind of memory, the latency time of which is small;
+moreover, if it appears that a program generates page faults under prepaging,
+the monitor may try to avoid this by some modification of the scheduling policy
+(for instance, if we have a round-robin policy, we may shorten the time-slice
+of the faulting program.)
+
+In the holon system, the synthesizer can use the description of the computer
+architecture to choose the place and the extent of the page requests. The
+avoidance of page faults is a design goal, not a guarantee.
+
+The Atlas system,\autocite{baylis1968paging} uses an elaborated algorithm to
+detect pages involved in loop computations. The Burroughs {\sc b}6700 tries to
+define a ``working set'' for each program and adjusts it in order to provide a
+fixed rate of page faulting.\autocite{fenton1972b6700} The prepaging policy
+that we have described should be compared to these kinds of designs.
+
+%************************************************
+\chapter{Conclusion}
+%************************************************
+
+In this survey we have described the main features of the holon concept and its
+use in programming languages.
+
+As ``the proof of the pudding is in the eating,'' we presently start an
+implementation of the holon programming language. With it, it will be possible
+to evaluate practically the usefulness of the language.
+
+\bigskip
+\bigskip
+\bigskip
+
+\hfill Pierre-Arnoul de Marneffe
+
+\hfill Universit\'e de Li\`ege
+
+\hfill Li\`ege Belgium
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Appendix}
+
+In this appendix, we comment on a few peculiar points.
+
+\section{The use of the exit statement}
+
+The \kw{exit} statement is only a \kw{goto} the end of a holon; this
+restriction forbids the \kw{exit} statement to be used to get out of a loop.
+Using the \kw{exit} statement, you first reach the end of the repetitive part
+of the loop; but next, you must pass through the test part of the loop.
+
+Example: The searching of a file for the appearance of a given key. There are
+two exits of the searching process: either an item matching the key is found,
+or the end of the file is reached without finding any matching item.
+
+A holon program for this may be written as follows:
+
+\smallskip\noindent
+search for a matching \%KEY\%\\
+\ind{1}\kw{begin} \kw{do} try to match next item in the file to \%KEY\%\\
+\ind{2}\kw{while} the end of file is not reached or the item is not found;\\
+\ind{1}\kw{end}
+
+\smallskip\noindent
+the end of file \kw{etc} \\
+\ind{1}\kw{begin} \\
+\ind{2}\kw{declare} unfound, NOEOF: \kw{boolean at} search \kw{etc}
+\kw{level}\\
+\ind{2}\kw{initial} \# unfound $\gets$ {\it true}; NOEOF $\gets$ {\it true}
+\#\#;\\
+\ind{2}(unfound $\equiv$ {\it true}) \kw{and} (NOEOF $\equiv$ {\it true})
+\#\#\\
+\ind{1}\kw{end}
+
+\smallskip\noindent
+try to match \kw{etc} \\
+\ind{1}\kw{begin} \\
+\ind{2}\kw{declare} F: \kw{file at} search \kw{etc} \kw{level}\\
+\ind{2}\kw{declare} index: \kw{integer at} search \kw{etc} \kw{level}\\
+\ind{2}\kw{initial} \# index $\gets$ $1$ \#\#;\\
+\ind{2}\kw{if} \# F(index) $\equiv$ 'EOF' \#\# \kw{then} \# NOEOF $\gets$ {\it
+false}
+\#\# \kw{exit};\\
+\ind{2}\kw{if} \# F(index) $\equiv$ \%KEY\% \#\#\\
+\ind{3}\kw{then} \# unfound $\gets$ {\sl false} \#\# \kw{exit}\\
+\ind{3}\kw{else} \# index $\gets$ index $+$ $1$ \#\#;\\
+\ind{1}\kw{end}
+
+\smallskip\noindent
+\%KEY\% is not declared because it must appear in an outer holon requesting
+this search.
+
+As a matter of fact, the example is too simple to show the use of \kw{exit}.
+We can code the two \kw{if}s like a \kw{case} statement because there is
+nothing to do after the two tests. An obvious way to code the program is
+something like:
+
+\medskip
+\noindent
+\ind{2}index $\gets$ $1$;\\
+\ind{2}\kw{while} (F(index) $\neq$ \%KEY\%) \kw{and} NOEOF\\
+\ind{2}\kw{do} index $\gets$ index $+$ $1$;
+
+\medskip
+\noindent
+But the matter here was to show how people must use the \kw{exit} statement,
+if one wants to use it.
+
+\section{Understanding the holon concept}
+
+The author really doesn't know to what extent the reader can grasp the holon
+concept without reading Koestler's book.\autocite{koestler1968ghost}
+
+Nevertheless, we shall give two other examples of using the holon model. The
+first one, quoted from ``The Revolutionist's Handbook'' by George Bernard Shaw,
+is a case for the necessity of environment-checking. The second one is a
+personal interpretation of some early American building designs; it will
+expound the tendency to integration.
+
+\subsection{The self-controlled glutton}
+
+This description was used by Bernard Shaw to expound his statement that: ``The
+survival of the fittest means finally the survival of the self-controlled,
+because they alone can adapt themselves to the perpetual shifting of
+conditions\,\dots .''
+
+``The Glutton, as the man with the strongest motive for nourishing himself,
+will always take more pains than his fellows to get food. When food is so
+difficult to get that only great exertions can secure a sufficient supply of
+it, the Glutton's appetite develops his cunning and enterprise to the utmost;
+and he becomes not only the best fed but the ablest man in the community. But
+in more hospitable climates, or where the social organization of the food
+supply makes it easy for a man to overeat, then the Glutton eats himself out of
+health and finally out of existence.''\autocite{shaw1903revolutionist}
+
+\subsection{The integration design at work}
+
+An example of two ways (an unintegrated one and an integrated one) of
+implementing the same function can be seen in two early American buildings:
+George Washington's Mount Vernon and Thomas Jefferson's Monticello.
+
+It seems that a plantation of that time was composed by a lot of ``units'': the
+mansion, the laundry, the smoke house, the kitchen, the dairy, the stable, the
+weaving house, etc\,\dots .
+
+Mount Vernon looks like a small town, each of the ``units'' implemented like a
+house.
+
+At Monticello, Jefferson put together all the units by locating them beneath
+two long terraces forming aisles of the mansion. All the ``units'' are
+connected by an all-weather passageway. This way to ``integrate'' the buildings
+renders all the ``units,'' except the mansion, as inconspicuous as possible.
+
+The final results, as a visitor can see, are completely different;
+nevertheless, they both have fulfilled the same function.
+
+\section{Chronology}
+
+The first report on holon programming circulated privately in December
+'72.\autocite{marneffe1972}
+
+In February '73, a submitted draft was accepted by the selection committee of
+the International Computing Symposium '73. The ICS was held in Davos,
+Switzerland, the 4th through the 7th of September '73.
+
+The paper ``Holon Programming'' will be published in the ICS '73 proceedings by
+North-Holland.\autocite{marneffe1973}
+
+In September '73, P. Henderson (University of Newcastle upon Tyne)  made us
+aware of a series of three articles on the CADES system by David Pearson (ICL)
+published in Computer Weekly (7/26/73, 8/2/73, 8/19/73). The CADES system is
+using a top-down approach called ``structural modelling.'' The designers of
+this system call a ``holon'' a unit of software design. The CADES system is a
+data-oriented one: ``\dots The emphasis is on code being designed to manipulate
+defined data structures rather than data structures being invented to support
+the codification of abstract functions\,\dots'' That is working in the opposite
+direction of our approach. Calling their units ``holons'' is correct because
+these units have the two features of a holon: (1) ``\dots A highly resilient,
+modular design results with each holon only manipulating a strictly-defined
+small subset of the universal set of available data''; and (2) ``\dots It is to
+be emphasized that one level only will appear finally in machine-executable
+codified form\,\dots''
+
+I am very happy that other people are tempted to use the ``holon concept'' to
+master program complexity.
+
+\chapter{Acknowledgments}
+
+First of all, I want to thank Prof. D. Ribbens (University of Li\`ege,
+Belgium), who is my teacher in computer science, especially  for the many
+discussions and comments about this work.
+
+All our gratitude for Prof. E.W. Dijkstra for his many helpful comments he made
+on previous reports.
+
+I want to thank Prof. H. Leroy (Institut d'Informatique, Namur, Belgium), Prof.
+E. Milgrom (University of Louvain-la-Neuve, Belgium), and Mr. W.H. Feijen
+(T.H.E. Eindhoven) for the useful comments and criticisms they made.
+
+I thank the Belgian National Fund for Scientific Research (F.N.R.S.) and
+IBM--Belgium to have granted our stay at the IBM Federal System Center
+(Gaithersburg, Maryland).
+
+I am indebted to Dr. Harlan Mills of IBM Gaithersburg, who so kindly accepted
+my stay at IBM Gaithersburg. I shall never forget how the people there and
+especially Mrs. Carole Hall, Mr. Jay Arnold, Jayadev Misra, Jim Whitlock, and
+Bill Patterson welcomed me so friendly.
+
+I must thank Mrs. Barbara Heflin, who managed to type this text so efficiently,
+and the Word Processing and Art Department for the work they have done.
+
+\chapter{Transcriber's Endnote}
+
+The phrasings used by Prof. de Marneffe have been preserved except in a few
+cases where a gallicism obscured the meaning. Please send any bugs or
+suggestions to {\tt holon.programming@gmail.com}.
+
+Thanks to Don Knuth for directing me to the only extant hard copy of this
+survey,\marginnote{And, of course, for {\TeX}\ and \mbox{literate
+programming}!} for sending a copy of his 1974 letter to the author, and for
+allowing the letter to be reproduced here. Thanks to the librarians at the
+German National Library of Science and Technology in Hanover, Germany and those
+at Love Library in Lincoln, Nebraska who helped me get a hold of this rare
+book. Thanks to the creators of the {\tt tufte-book} document class for
+creating such a lovely template.
+
+And many thanks to the late Prof. Pierre-Arnoul Frédéric Guy Donat de Marneffe
+(1946--2023) for his work and his kind answers to my inquiries.
+
+\bigskip
+
+\hfill Mitch Gerrard
+
+\hfill April 2024
+
+%%
+% The back matter contains appendices, bibliographies, indices, glossaries,
+% etc.
+
+\backmatter
+
+\chapter{Bibliography}
+\printbibliography[heading=none]
+
+\end{document}
